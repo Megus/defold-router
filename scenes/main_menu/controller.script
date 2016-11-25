@@ -1,0 +1,14 @@
+function init(self)
+    msg.post(".", "acquire_input_focus")
+end
+
+function on_message(self, message_id, message, sender)
+    if message_id == hash("start") then
+        msg.post("main:/scenes#router", "scene_close")
+    elseif message_id == hash("settings") then
+        msg.post("gui", "disable")
+        msg.post("main:/scenes#router", "scene_push_modal", {scene_name = "settings", popup = true})
+    elseif message_id == hash("scene_popped") then
+        msg.post("gui", "enable")
+    end
+end

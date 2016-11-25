@@ -1,0 +1,143 @@
+-- Defold Router
+--
+-- © 2016 Roman "Megus" Petrov, Wise Hedgehog Studio.
+-- https://megus.org, https://wisehedgehog.studio
+
+local routing = require("main.routing")
+
+-- Scene display methods
+local methods = {
+    switch = 0,
+    push = 1,
+    push_modal = 2,
+    restore = 3,
+}
+
+--- Returns scene controller URL string
+-- You should use the same names for your scene controllers
+-- @tparam string name Scene name
+-- @treturn string Scene controller URL
+local function scene_controller_url(name)
+    return name .. ":/controller#script"
+end
+
+--- Puts the next scene to the scene stack and loads it
+-- @tparam tab self Game object
+-- @tparam number method One of methods constants
+-- @tparam tab message Message table
+local function next_scene(self, method, message)
+    local scene
+
+    if method == methods.switch then
+        -- Switch a scene, use the state machine to get the next scene
+        local current_name = "first_scene"
+        if #self.scene_stack ~= 0 then
+            current_name = self.scene_stack[#self.scene_stack].name
+            -- Save the state of the current scene
+            self.scene_states[current_name] = message.state
+        end
+        local next_name, input = routing[current_name](message and message.output or nil)
+        scene = {name = next_name, input = input, method = method}
+    elseif method == methods.push then
+        -- Push the new scene, the current one will be unloaded so we also save the state
+        self.scene_states[self.scene_stack[#self.scene_stack].name] = message.state
+        scene = {name = message.scene_name, input = message.input, method = method}
+    elseif method == methods.push_modal then
+        -- Push the new scene over the curent one (modal push)
+        scene = {name = message.scene_name, input = message.input, method = method, popup = message.popup}
+    elseif method == methods.restore then
+        -- Restore the previous scene
+        local previous = self.scene_stack[#self.scene_stack - 1]
+        scene = {name = previous.name, input = previous.input,
+            output = message.output, method = previous.method, restored = true}
+        -- Remove it for now, it will be pushed back below
+        table.remove(self.scene_stack, #self.scene_stack - 1)
+    end
+    -- Push the next scene to the stack
+    table.insert(self.scene_stack, scene)
+    msg.post("scenes#" .. scene.name, "load")
+end
+
+--- Unload a scene
+-- Just a handy function because we need it twice
+-- @tparam string url Scene URL
+local function unload_scene(url)
+    msg.post(url, "disable")
+    msg.post(url, "final")
+    msg.post(url, "unload")
+end
+
+function init(self)
+    -- Acquire input focus to let loaded scenes accept input
+    msg.post(".", "acquire_input_focus")
+    -- Init scene stack and scene state storage
+    self.scene_stack = {}
+    self.scene_states = {}
+    -- Load the first scene
+    next_scene(self, methods.switch)
+end
+
+function on_message(self, message_id, message, sender)
+    -- A new scene is loaded
+    if message_id == hash("proxy_loaded") then
+    	-- print("Loaded " .. sender.fragment)
+        local previous = (#self.scene_stack > 1) and self.scene_stack[#self.scene_stack - 1] or nil
+        local current = self.scene_stack[#self.scene_stack]
+        -- Unload the previous scene if needed
+    	if previous and (current.method == methods.switch or current.method == methods.push) then
+            unload_scene("#" .. previous.name)
+            if current.method == methods.switch or current.restored then
+                table.remove(self.scene_stack, #self.scene_stack - 1)
+            end
+        -- Disable the previous scene on modal push
+    	elseif current.method == methods.push_modal then
+            if current.popup then
+                msg.post(scene_controller_url(previous.name), "release_input_focus")
+            else
+                msg.post("#" .. previous.name, "disable")
+            end
+        end
+		-- Init and enable new scene
+    	msg.post(sender, "init")
+    	msg.post(sender, "enable")
+        -- Pass the input to the new scene
+        if not current.restored then
+            msg.post(scene_controller_url(current.name), "scene_input",
+                {input = current.input, state = self.scene_states[self.scene_name]})
+        else
+            msg.post(scene_controller_url(current.name), "scene_popped",
+                {output = current.output, state = self.scene_states[self.scene_name]})
+        end
+    -- Scene is unloaded
+    elseif message_id == hash("proxy_unloaded") then
+        -- Currently we don't need to do anything here
+    	-- print("Unloaded " .. sender.fragment)
+    -- Handle scene modal push
+    elseif message_id == hash("scene_push_modal") then
+        next_scene(self, methods.push_modal, message)
+    -- Handle scene push
+    elseif message_id == hash("scene_push") then
+        next_scene(self, methods.push, message)
+    -- Handle scene close
+    elseif message_id == hash("scene_close") then
+        local current = self.scene_stack[#self.scene_stack]
+        -- This scene appeared by switching, the state-machine will be used
+        if current.method == methods.switch then
+            next_scene(self, methods.switch, message)
+        -- It was a pushed scene, we need to restore the previous one
+        elseif current.method == methods.push then
+            next_scene(self, methods.restore, message)
+        -- It was modally pushed scene, unload it and enable the previous one
+        elseif current.method == methods.push_modal then
+            unload_scene("#" .. self.scene_stack[#self.scene_stack].name)
+            table.remove(self.scene_stack)
+            local previous = self.scene_stack[#self.scene_stack]
+            if current.popup then
+                msg.post(scene_controller_url(previous.name), "acquire_input_focus")
+            else
+                msg.post("#" .. previous.name, "enable")
+            end
+            msg.post(scene_controller_url(previous.name), "scene_popped", {output = message.output})
+        end
+    end
+end
