@@ -84,11 +84,8 @@ function on_message(self, message_id, message, sender)
         local previous = (#self.scene_stack > 1) and self.scene_stack[#self.scene_stack - 1] or nil
         local current = self.scene_stack[#self.scene_stack]
         -- Unload the previous scene if needed
-    	if previous and (current.method == methods.switch or current.method == methods.push) then
+    	if previous and (current.method == methods.switch or current.method == methods.push or current.restored) then
             unload_scene("#" .. previous.name)
-            if current.method == methods.switch or current.restored then
-                table.remove(self.scene_stack, #self.scene_stack - 1)
-            end
         -- Disable the previous scene on modal push
     	elseif current.method == methods.push_modal then
             msg.post("#" .. previous.name, "disable")
@@ -96,8 +93,11 @@ function on_message(self, message_id, message, sender)
         elseif current.method == methods.popup then
             msg.post(scene_controller_url(previous.name), "release_input_focus")
         end
+        -- Remove previous scene from the stack if it was a switch or the current scene was restored
+        if current.method == methods.switch or current.restored then
+            table.remove(self.scene_stack, #self.scene_stack - 1)
+        end
 		-- Init and enable new scene
-        pprint(self.scene_stack)
     	msg.post(sender, "init")
     	msg.post(sender, "enable")
         -- Pass the input to the new scene
