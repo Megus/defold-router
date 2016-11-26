@@ -10,7 +10,8 @@ local methods = {
     switch = 0,
     push = 1,
     push_modal = 2,
-    restore = 3,
+    popup = 3,
+    restore = 4,
 }
 
 --- Returns scene controller URL string
@@ -38,13 +39,12 @@ local function next_scene(self, method, message)
         end
         local next_name, input = routing[current_name](message and message.output or nil)
         scene = {name = next_name, input = input, method = method}
-    elseif method == methods.push then
-        -- Push the new scene, the current one will be unloaded so we also save the state
-        self.scene_states[self.scene_stack[#self.scene_stack].name] = message.state
+    elseif method == methods.push or method == methods.push_modal or method == methods.popup then
+        -- All these methods are pushing the new scene
+        if method == methods.push then
+            self.scene_states[self.scene_stack[#self.scene_stack].name] = message.state
+        end
         scene = {name = message.scene_name, input = message.input, method = method}
-    elseif method == methods.push_modal then
-        -- Push the new scene over the curent one (modal push)
-        scene = {name = message.scene_name, input = message.input, method = method, popup = message.popup}
     elseif method == methods.restore then
         -- Restore the previous scene
         local previous = self.scene_stack[#self.scene_stack - 1]
@@ -91,11 +91,10 @@ function on_message(self, message_id, message, sender)
             end
         -- Disable the previous scene on modal push
     	elseif current.method == methods.push_modal then
-            if current.popup then
-                msg.post(scene_controller_url(previous.name), "release_input_focus")
-            else
-                msg.post("#" .. previous.name, "disable")
-            end
+            msg.post("#" .. previous.name, "disable")
+        -- Release input focus from the previous scene on popup
+        elseif current.method == methods.popup then
+            msg.post(scene_controller_url(previous.name), "release_input_focus")
         end
 		-- Init and enable new scene
     	msg.post(sender, "init")
@@ -103,10 +102,10 @@ function on_message(self, message_id, message, sender)
         -- Pass the input to the new scene
         if not current.restored then
             msg.post(scene_controller_url(current.name), "scene_input",
-                {input = current.input, state = self.scene_states[self.scene_name]})
+                {input = current.input, state = self.scene_states[current.name]})
         else
             msg.post(scene_controller_url(current.name), "scene_popped",
-                {output = current.output, state = self.scene_states[self.scene_name]})
+                {output = current.output, state = self.scene_states[current.name]})
         end
     -- Scene is unloaded
     elseif message_id == hash("proxy_unloaded") then
@@ -115,6 +114,9 @@ function on_message(self, message_id, message, sender)
     -- Handle scene modal push
     elseif message_id == hash("scene_push_modal") then
         next_scene(self, methods.push_modal, message)
+    -- Handle scene popup
+    elseif message_id == hash("scene_popup") then
+        next_scene(self, methods.popup, message)
     -- Handle scene push
     elseif message_id == hash("scene_push") then
         next_scene(self, methods.push, message)
@@ -128,11 +130,11 @@ function on_message(self, message_id, message, sender)
         elseif current.method == methods.push then
             next_scene(self, methods.restore, message)
         -- It was modally pushed scene, unload it and enable the previous one
-        elseif current.method == methods.push_modal then
+        elseif current.method == methods.push_modal or current.method == methods.popup then
             unload_scene("#" .. self.scene_stack[#self.scene_stack].name)
             table.remove(self.scene_stack)
             local previous = self.scene_stack[#self.scene_stack]
-            if current.popup then
+            if current.method == methods.popup then
                 msg.post(scene_controller_url(previous.name), "acquire_input_focus")
             else
                 msg.post("#" .. previous.name, "enable")

@@ -2,16 +2,10 @@ images {
   image: "/resources/button.png"
 }
 images {
-  image: "/resources/button-pressed.png"
+  image: "/resources/textbox.png"
 }
 images {
   image: "/resources/button-red.png"
-}
-images {
-  image: "/resources/button-red-pressed.png"
-}
-images {
-  image: "/resources/textbox.png"
 }
 margin: 0
 extrude_borders: 1

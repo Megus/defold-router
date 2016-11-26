@@ -1,9 +1,11 @@
+local router_helper = require("main.router_helper")
+
 function init(self)
     msg.post(".", "acquire_input_focus")
 end
 
 function on_message(self, message_id, message, sender)
     if message_id == hash("close") then
-        msg.post("main:/scenes#router", "scene_close")
+        router_helper.close_scene()
     end
 end

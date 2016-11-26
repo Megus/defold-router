@@ -1,0 +1,35 @@
+function init(self)
+    msg.post(".", "acquire_input_focus")
+end
+
+function on_message(self, message_id, message, sender)
+    if message_id == hash("highlight_world") then
+        for world = 1,3 do
+            local node = gui.get_node("world" .. world .. "/box")
+            local animation = (world == message.world) and "button-red" or "button"
+            gui.play_flipbook(node, animation)
+        end
+    end
+end
+
+function on_input(self, action_id, action)
+    if action_id == hash("mouse") and action.released then
+		if gui.pick_node(gui.get_node("back/box"), action.x, action.y) then
+			msg.post("controller#script", "close")
+		elseif gui.pick_node(gui.get_node("settings/box"), action.x, action.y) then
+            msg.post("controller#script", "settings")
+        elseif gui.pick_node(gui.get_node("world1/box"), action.x, action.y) then
+            msg.post("controller#script", "select_world", {world = 1})
+        elseif gui.pick_node(gui.get_node("world2/box"), action.x, action.y) then
+            msg.post("controller#script", "select_world", {world = 2})
+        elseif gui.pick_node(gui.get_node("world3/box"), action.x, action.y) then
+            msg.post("controller#script", "select_world", {world = 3})
+        elseif gui.pick_node(gui.get_node("level1/box"), action.x, action.y) then
+            msg.post("controller#script", "select_level", {level = 1})
+        elseif gui.pick_node(gui.get_node("level2/box"), action.x, action.y) then
+            msg.post("controller#script", "select_level", {level = 2})
+        elseif gui.pick_node(gui.get_node("level3/box"), action.x, action.y) then
+            msg.post("controller#script", "select_level", {level = 3})
+	    end
+    end
+end
