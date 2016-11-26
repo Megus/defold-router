@@ -4,7 +4,7 @@ embedded_instances {
   id: "controller"
   data: "components {\n"
   "  id: \"script\"\n"
-  "  component: \"/scenes/main_menu/controller.script\"\n"
+  "  component: \"/scenes/main_menu/main_menu.script\"\n"
   "  position {\n"
   "    x: 0.0\n"
   "    y: 0.0\n"
@@ -36,7 +36,7 @@ embedded_instances {
   }
 }
 embedded_instances {
-  id: "go"
+  id: "bg"
   data: "embedded_components {\n"
   "  id: \"sprite\"\n"
   "  type: \"sprite\"\n"

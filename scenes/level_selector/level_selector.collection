@@ -2,27 +2,7 @@ name: "level_selector"
 scale_along_z: 0
 embedded_instances {
   id: "bg"
-  data: "embedded_components {\n"
-  "  id: \"sprite\"\n"
-  "  type: \"sprite\"\n"
-  "  data: \"tile_set: \\\"/resources/bg.atlas\\\"\\n"
-  "default_animation: \\\"background\\\"\\n"
-  "material: \\\"/builtins/materials/sprite.material\\\"\\n"
-  "blend_mode: BLEND_MODE_ALPHA\\n"
-  "\"\n"
-  "  position {\n"
-  "    x: 0.0\n"
-  "    y: 0.0\n"
-  "    z: 0.0\n"
-  "  }\n"
-  "  rotation {\n"
-  "    x: 0.0\n"
-  "    y: 0.0\n"
-  "    z: 0.0\n"
-  "    w: 1.0\n"
-  "  }\n"
-  "}\n"
-  ""
+  data: "embedded_components {\n  id: \"sprite\"\n  type: \"sprite\"\n  data: \"tile_set: \\\"/resources/bg.atlas\\\"\\ndefault_animation: \\\"background\\\"\\nmaterial: \\\"/builtins/materials/sprite.material\\\"\\nblend_mode: BLEND_MODE_ALPHA\\n\"\n  position {\n    x: 0.0\n    y: 0.0\n    z: 0.0\n  }\n  rotation {\n    x: 0.0\n    y: 0.0\n    z: 0.0\n    w: 1.0\n  }\n}\n"
   position {
     x: 400.0
     y: 300.0
@@ -42,22 +22,7 @@ embedded_instances {
 }
 embedded_instances {
   id: "controller"
-  data: "components {\n"
-  "  id: \"script\"\n"
-  "  component: \"/scenes/level_selector/controller.script\"\n"
-  "  position {\n"
-  "    x: 0.0\n"
-  "    y: 0.0\n"
-  "    z: 0.0\n"
-  "  }\n"
-  "  rotation {\n"
-  "    x: 0.0\n"
-  "    y: 0.0\n"
-  "    z: 0.0\n"
-  "    w: 1.0\n"
-  "  }\n"
-  "}\n"
-  ""
+  data: "components {\n  id: \"script\"\n  component: \"/scenes/level_selector/level_selector.script\"\n  position {\n    x: 0.0\n    y: 0.0\n    z: 0.0\n  }\n  rotation {\n    x: 0.0\n    y: 0.0\n    z: 0.0\n    w: 1.0\n  }\n}\n"
   position {
     x: 0.0
     y: 0.0
@@ -77,22 +42,7 @@ embedded_instances {
 }
 embedded_instances {
   id: "gui"
-  data: "components {\n"
-  "  id: \"gui\"\n"
-  "  component: \"/scenes/level_selector/level_selector.gui\"\n"
-  "  position {\n"
-  "    x: 0.0\n"
-  "    y: 0.0\n"
-  "    z: 0.0\n"
-  "  }\n"
-  "  rotation {\n"
-  "    x: 0.0\n"
-  "    y: 0.0\n"
-  "    z: 0.0\n"
-  "    w: 1.0\n"
-  "  }\n"
-  "}\n"
-  ""
+  data: "components {\n  id: \"gui\"\n  component: \"/scenes/level_selector/level_selector.gui\"\n  position {\n    x: 0.0\n    y: 0.0\n    z: 0.0\n  }\n  rotation {\n    x: 0.0\n    y: 0.0\n    z: 0.0\n    w: 1.0\n  }\n}\n"
   position {
     x: 243.62788
     y: 345.52594
