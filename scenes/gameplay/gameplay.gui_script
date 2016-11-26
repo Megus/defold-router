@@ -1,29 +1,21 @@
 function init(self)
-    -- Add initialization code here
-    -- Remove this function if not needed
-end
-
-function final(self)
-    -- Add finalization code here
-    -- Remove this function if not needed
-end
-
-function update(self, dt)
-    -- Add update code here
-    -- Remove this function if not needed
+    msg.post(".", "acquire_input_focus")
 end
 
 function on_message(self, message_id, message, sender)
-    -- Add message-handling code here
-    -- Remove this function if not needed
+    if message_id == hash("show_level_number") then
+        gui.set_text(gui.get_node("level/text"), "Level " .. message.world .. "-" .. message.level)
+    end
 end
 
 function on_input(self, action_id, action)
-    -- Add input-handling code here
-    -- Remove this function if not needed
-end
-
-function on_reload(self)
-    -- Add input-handling code here
-    -- Remove this function if not needed
+    if action_id == hash("mouse") and action.released then
+		if gui.pick_node(gui.get_node("settings/box"), action.x, action.y) then
+            msg.post("controller#script", "settings")
+        elseif gui.pick_node(gui.get_node("win/box"), action.x, action.y) then
+            msg.post("controller#script", "win")
+        elseif gui.pick_node(gui.get_node("fail/box"), action.x, action.y) then
+            msg.post("controller#script", "fail")
+	    end
+    end
 end

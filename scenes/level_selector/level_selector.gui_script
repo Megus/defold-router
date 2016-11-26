@@ -9,6 +9,8 @@ function on_message(self, message_id, message, sender)
             local animation = (world == message.world) and "button-red" or "button"
             gui.play_flipbook(node, animation)
         end
+    elseif message_id == hash("set_info") then
+        gui.set_text(gui.get_node("info/text"), message.text)
     end
 end
 

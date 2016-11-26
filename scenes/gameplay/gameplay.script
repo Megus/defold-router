@@ -1,29 +1,22 @@
+local router_helper = require("main.router_helper")
+
 function init(self)
-    -- Add initialization code here
-    -- Remove this function if not needed
-end
-
-function final(self)
-    -- Add finalization code here
-    -- Remove this function if not needed
-end
-
-function update(self, dt)
-    -- Add update code here
-    -- Remove this function if not needed
+    msg.post(".", "acquire_input_focus")
 end
 
 function on_message(self, message_id, message, sender)
-    -- Add message-handling code here
-    -- Remove this function if not needed
-end
-
-function on_input(self, action_id, action)
-    -- Add input-handling code here
-    -- Remove this function if not needed
-end
-
-function on_reload(self)
-    -- Add reload-handling code here
-    -- Remove this function if not needed
+    if message_id == hash("scene_input") then
+        self.world = message.input.world
+        self.level = message.input.level
+        msg.post("gui", "show_level_number", {world = self.world, level = self.level})
+    elseif message_id == hash("settings") then
+        msg.post("gui", "disable")
+        router_helper.popup("settings")
+    elseif message_id == hash("scene_popped") then
+        msg.post("gui", "enable")
+    elseif message_id == hash("win") then
+        router_helper.close_scene({win = true, world = self.world, level = self.level}, state)
+    elseif message_id == hash("fail") then
+        router_helper.close_scene({win = false, world = self.world, level = self.level}, state)
+    end
 end

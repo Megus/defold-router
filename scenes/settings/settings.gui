@@ -196,9 +196,9 @@ nodes {
   }
   type: TYPE_TEXT
   blend_mode: BLEND_MODE_ALPHA
-  text: "This screen was shown with \"scene_push_modal\" message and popup option. It is a good way to show any popup (e.g. settings) in your game."
+  text: "This screen was shown with \"scene_popup\" message. It is a good way to show any popup (e.g. settings) in your game."
   font: "text"
-  id: "info/boxtext"
+  id: "info/text"
   xanchor: XANCHOR_NONE
   yanchor: YANCHOR_NONE
   pivot: PIVOT_CENTER
@@ -373,7 +373,7 @@ nodes {
   blend_mode: BLEND_MODE_ALPHA
   text: "Close"
   font: "menu"
-  id: "close/boxtext"
+  id: "close/text"
   xanchor: XANCHOR_NONE
   yanchor: YANCHOR_NONE
   pivot: PIVOT_CENTER

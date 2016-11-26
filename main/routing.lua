@@ -31,9 +31,9 @@ end
 
 function M.gameplay(output)
     if output.win then
-        return "win"
+        return "win", {world = output.world, level = output.level}
     else
-        return "fail"
+        return "fail", {world = output.world, level = output.level}
     end
 end
 

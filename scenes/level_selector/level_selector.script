@@ -8,14 +8,22 @@ local function set_state(self, state)
     if state then
         self.state = state
     else
-        self.state = {world = 1}
+        self.state = {world = 1, wins = 0, fails = 0}
     end
 end
 
 function on_message(self, message_id, message, sender)
     if message_id == hash("scene_input") then
         set_state(self, message.state)
+        if message.input and message.input.win ~= nil then
+            if message.input.win then
+                self.state.wins = self.state.wins + 1
+            else
+                self.state.fails = self.state.fails + 1
+            end
+        end
         msg.post("gui", "highlight_world", {world = self.state.world})
+        msg.post("gui", "set_info", {text = "Wins: " .. self.state.wins .. ", Fails: " .. self.state.fails})
     elseif message_id == hash("close") then
         router_helper.close_scene(nil, self.state)
     elseif message_id == hash("settings") then
@@ -25,7 +33,7 @@ function on_message(self, message_id, message, sender)
         self.state.world = message.world
         msg.post("gui", "highlight_world", {world = self.state.world})
     elseif message_id == hash("select_level") then
-        router_helper.close_scene({world = self.state.world}, self.state)
+        router_helper.close_scene({world = self.state.world, level = message.level}, self.state)
     elseif message_id == hash("scene_popped") then
         msg.post("gui", "enable")
     end
