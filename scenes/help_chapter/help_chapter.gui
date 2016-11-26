@@ -7,8 +7,8 @@ background_color {
 }
 nodes {
   position {
-    x: 400.0
-    y: 300.0
+    x: 150.0
+    y: 550.0
     z: 0.0
     w: 1.0
   }
@@ -38,7 +38,7 @@ nodes {
   }
   type: TYPE_TEMPLATE
   blend_mode: BLEND_MODE_ALPHA
-  id: "label"
+  id: "back"
   xanchor: XANCHOR_NONE
   yanchor: YANCHOR_NONE
   pivot: PIVOT_CENTER
@@ -74,7 +74,7 @@ nodes {
   }
   size {
     x: 200.0
-    y: 100.0
+    y: 60.0
     z: 0.0
     w: 1.0
   }
@@ -86,13 +86,13 @@ nodes {
   }
   type: TYPE_BOX
   blend_mode: BLEND_MODE_ALPHA
-  texture: "objects/textbox"
-  id: "label/box"
+  texture: "objects/button"
+  id: "back/box"
   xanchor: XANCHOR_NONE
   yanchor: YANCHOR_NONE
   pivot: PIVOT_CENTER
   adjust_mode: ADJUST_MODE_FIT
-  parent: "label"
+  parent: "back"
   layer: ""
   inherit_alpha: true
   slice9 {
@@ -105,6 +105,8 @@ nodes {
   clipping_visible: true
   clipping_inverted: false
   alpha: 1.0
+  overridden_fields: 4
+  overridden_fields: 9
   template_node_child: true
   size_mode: SIZE_MODE_MANUAL
 }
@@ -112,6 +114,75 @@ nodes {
   position {
     x: 0.0
     y: 0.0
+    z: 0.0
+    w: 1.0
+  }
+  rotation {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 1.0
+  }
+  scale {
+    x: 1.0
+    y: 1.0
+    z: 1.0
+    w: 1.0
+  }
+  size {
+    x: 200.0
+    y: 50.0
+    z: 0.0
+    w: 1.0
+  }
+  color {
+    x: 1.0
+    y: 1.0
+    z: 1.0
+    w: 1.0
+  }
+  type: TYPE_TEXT
+  blend_mode: BLEND_MODE_ALPHA
+  text: "Back"
+  font: "menu"
+  id: "back/text"
+  xanchor: XANCHOR_NONE
+  yanchor: YANCHOR_NONE
+  pivot: PIVOT_CENTER
+  outline {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 1.0
+  }
+  shadow {
+    x: 1.0
+    y: 1.0
+    z: 1.0
+    w: 1.0
+  }
+  adjust_mode: ADJUST_MODE_FIT
+  line_break: true
+  parent: "back/box"
+  layer: ""
+  inherit_alpha: true
+  clipping_mode: CLIPPING_MODE_NONE
+  clipping_visible: true
+  clipping_inverted: false
+  alpha: 1.0
+  outline_alpha: 1.0
+  shadow_alpha: 1.0
+  overridden_fields: 4
+  overridden_fields: 8
+  template_node_child: true
+  text_leading: 1.0
+  text_tracking: 0.0
+  size_mode: SIZE_MODE_AUTO
+}
+nodes {
+  position {
+    x: 400.0
+    y: 550.0
     z: 0.0
     w: 1.0
   }
@@ -139,11 +210,115 @@ nodes {
     z: 1.0
     w: 1.0
   }
+  type: TYPE_TEMPLATE
+  blend_mode: BLEND_MODE_ALPHA
+  id: "title"
+  xanchor: XANCHOR_NONE
+  yanchor: YANCHOR_NONE
+  pivot: PIVOT_CENTER
+  adjust_mode: ADJUST_MODE_FIT
+  layer: ""
+  inherit_alpha: true
+  clipping_mode: CLIPPING_MODE_NONE
+  clipping_visible: true
+  clipping_inverted: false
+  alpha: 1.0
+  template: "/common/label.gui"
+  template_node_child: false
+  size_mode: SIZE_MODE_AUTO
+}
+nodes {
+  position {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 1.0
+  }
+  rotation {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 1.0
+  }
+  scale {
+    x: 1.0
+    y: 1.0
+    z: 1.0
+    w: 1.0
+  }
+  size {
+    x: 200.0
+    y: 60.0
+    z: 0.0
+    w: 1.0
+  }
+  color {
+    x: 1.0
+    y: 1.0
+    z: 1.0
+    w: 1.0
+  }
+  type: TYPE_BOX
+  blend_mode: BLEND_MODE_ALPHA
+  texture: "objects/textbox"
+  id: "title/box"
+  xanchor: XANCHOR_NONE
+  yanchor: YANCHOR_NONE
+  pivot: PIVOT_CENTER
+  adjust_mode: ADJUST_MODE_FIT
+  parent: "title"
+  layer: ""
+  inherit_alpha: true
+  slice9 {
+    x: 8.0
+    y: 8.0
+    z: 8.0
+    w: 8.0
+  }
+  clipping_mode: CLIPPING_MODE_NONE
+  clipping_visible: true
+  clipping_inverted: false
+  alpha: 1.0
+  overridden_fields: 4
+  template_node_child: true
+  size_mode: SIZE_MODE_MANUAL
+}
+nodes {
+  position {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 1.0
+  }
+  rotation {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 1.0
+  }
+  scale {
+    x: 1.0
+    y: 1.0
+    z: 1.0
+    w: 1.0
+  }
+  size {
+    x: 200.0
+    y: 60.0
+    z: 0.0
+    w: 1.0
+  }
+  color {
+    x: 1.0
+    y: 1.0
+    z: 1.0
+    w: 1.0
+  }
   type: TYPE_TEXT
   blend_mode: BLEND_MODE_ALPHA
   text: "text"
   font: "menu"
-  id: "label/text"
+  id: "title/text"
   xanchor: XANCHOR_NONE
   yanchor: YANCHOR_NONE
   pivot: PIVOT_CENTER
@@ -161,7 +336,7 @@ nodes {
   }
   adjust_mode: ADJUST_MODE_FIT
   line_break: true
-  parent: "label/box"
+  parent: "title/box"
   layer: ""
   inherit_alpha: true
   clipping_mode: CLIPPING_MODE_NONE
@@ -170,6 +345,7 @@ nodes {
   alpha: 1.0
   outline_alpha: 1.0
   shadow_alpha: 1.0
+  overridden_fields: 4
   template_node_child: true
   text_leading: 1.0
   text_tracking: 0.0
@@ -208,7 +384,7 @@ nodes {
   }
   type: TYPE_TEMPLATE
   blend_mode: BLEND_MODE_ALPHA
-  id: "label1"
+  id: "text"
   xanchor: XANCHOR_NONE
   yanchor: YANCHOR_NONE
   pivot: PIVOT_CENTER
@@ -257,12 +433,12 @@ nodes {
   type: TYPE_BOX
   blend_mode: BLEND_MODE_ALPHA
   texture: "objects/textbox"
-  id: "label1/box"
+  id: "text/box"
   xanchor: XANCHOR_NONE
   yanchor: YANCHOR_NONE
   pivot: PIVOT_CENTER
   adjust_mode: ADJUST_MODE_FIT
-  parent: "label1"
+  parent: "text"
   layer: ""
   inherit_alpha: true
   slice9 {
@@ -313,7 +489,7 @@ nodes {
   blend_mode: BLEND_MODE_ALPHA
   text: "text"
   font: "menu"
-  id: "label1/text"
+  id: "text/text"
   xanchor: XANCHOR_NONE
   yanchor: YANCHOR_NONE
   pivot: PIVOT_CENTER
@@ -331,7 +507,7 @@ nodes {
   }
   adjust_mode: ADJUST_MODE_FIT
   line_break: true
-  parent: "label1/box"
+  parent: "text/box"
   layer: ""
   inherit_alpha: true
   clipping_mode: CLIPPING_MODE_NONE

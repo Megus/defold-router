@@ -16,6 +16,8 @@ function on_input(self, action_id, action)
             msg.post("controller#script", "win")
         elseif gui.pick_node(gui.get_node("fail/box"), action.x, action.y) then
             msg.post("controller#script", "fail")
-	    end
+	    elseif gui.pick_node(gui.get_node("help/box"), action.x, action.y) then
+            msg.post("controller#script", "help")
+        end
     end
 end

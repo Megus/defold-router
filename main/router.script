@@ -97,6 +97,7 @@ function on_message(self, message_id, message, sender)
             msg.post(scene_controller_url(previous.name), "release_input_focus")
         end
 		-- Init and enable new scene
+        pprint(self.scene_stack)
     	msg.post(sender, "init")
     	msg.post(sender, "enable")
         -- Pass the input to the new scene

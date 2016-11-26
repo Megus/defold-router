@@ -18,5 +18,8 @@ function on_message(self, message_id, message, sender)
         router_helper.close_scene({win = true, world = self.world, level = self.level}, state)
     elseif message_id == hash("fail") then
         router_helper.close_scene({win = false, world = self.world, level = self.level}, state)
+    elseif message_id == hash("help") then
+        msg.post("gui", "disable")
+        router_helper.push_modal("help")
     end
 end
