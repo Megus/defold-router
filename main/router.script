@@ -1,7 +1,7 @@
 -- Defold Router
 --
 -- © 2016 Roman "Megus" Petrov, Wise Hedgehog Studio.
--- https://megus.org, https://wisehedgehog.studio
+-- https://wisehedgehog.studio, https://megus.org
 
 local routing = require("main.routing")
 

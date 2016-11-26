@@ -247,8 +247,8 @@ nodes {
     w: 1.0
   }
   size {
-    x: 700.0
-    y: 100.0
+    x: 750.0
+    y: 180.0
     z: 0.0
     w: 1.0
   }
@@ -304,7 +304,7 @@ nodes {
   }
   size {
     x: 700.0
-    y: 100.0
+    y: 180.0
     z: 0.0
     w: 1.0
   }
@@ -316,7 +316,7 @@ nodes {
   }
   type: TYPE_TEXT
   blend_mode: BLEND_MODE_ALPHA
-  text: "text"
+  text: "This scene was displayed with \"scene_push_modal\" message. The previous scene is still loaded but disabled. You can use this method to show fullscreen scenes while keeping the previous scene in memory. It is useful if that scene has complex state (e.g. gameplay scene) and using state to restore it will be too complicated."
   font: "text"
   id: "text/text"
   xanchor: XANCHOR_NONE
@@ -346,6 +346,7 @@ nodes {
   outline_alpha: 1.0
   shadow_alpha: 1.0
   overridden_fields: 4
+  overridden_fields: 8
   overridden_fields: 10
   template_node_child: true
   text_leading: 1.0

@@ -196,7 +196,7 @@ nodes {
   }
   type: TYPE_TEXT
   blend_mode: BLEND_MODE_ALPHA
-  text: "This screen was shown with \"scene_popup\" message. It is a good way to show any popup (e.g. settings) in your game."
+  text: "This scene was displayed with \"scene_popup\" message. The previous scene is still loaded and displayed, but the input is disabled. It is a good way to show any popup (e.g. settings) in your game."
   font: "text"
   id: "info/text"
   xanchor: XANCHOR_NONE
