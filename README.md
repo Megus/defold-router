@@ -16,7 +16,7 @@ This router gives you several navigation methods:
 
 Add the library zip URL as a [dependency](http://www.defold.com/manuals/libraries/#_setting_up_library_dependencies) to your Defold project: [https://github.com/Megus/defold-router/archive/master.zip](https://github.com/Megus/defold-router/archive/master.zip)
 
-Create a game object (I recommend to call it ```scenes```) in the main collection with collection proxies for all your scenes (I'm using the word "scene" for a screen). Names of the proxies must match the names of your collections. Don't forget that collection filename is not the same as collection name, so please check that the ```name``` property of your collections are properly set.
+Create a game object (I recommend to call it ```scenes```) in the main collection with [collection proxies](http://www.defold.com/manuals/collection-proxies/) for all your scenes (I'm using the word "scene" for a screen). Names of the proxies must match the names of your collections. Don't forget that collection filename is not the same as collection name, so please check that the ```name``` property of your collections are properly set.
 
 Create a routing table Lua module (e.g. ```routing.lua``` in ```main``` folder) with the following sample content:
 
@@ -38,7 +38,8 @@ local routing = require("main.routing") -- Path to your routing table
 
 function init(self)
     msg.post(".", "acquire_input_focus")
-    -- Create the router with the main routing table. It will automatically load the first scene
+    -- Create the router with the main routing table.
+    -- It will automatically load the first scene.
     self.router = router.new(routing, "main:/scenes#router", "controller#script")
 end
 
@@ -78,7 +79,7 @@ function M.level_selector(output)
 end
 ```
 
-#### Using navigation stack
+#### Using the navigation stack
 
 ### Handling Router messages in collection scripts
 
