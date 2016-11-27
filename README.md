@@ -105,4 +105,6 @@ end
 ```
 
 ---
+If you have any questions or suggestions, feel free to contact me: megus.sugem@gmail.com
+
 Created and maintained by Roman "Megus" Petrov / [Wise Hedgehog Studio](https://wisehedgehog.studio).
