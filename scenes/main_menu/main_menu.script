@@ -3,7 +3,7 @@
 -- © 2016 Roman "Megus" Petrov, Wise Hedgehog Studio.
 -- https://wisehedgehog.studio, https://megus.org
 
-local router = require("router.router")
+local router = require("wh_router.router")
 
 function init(self)
     msg.post(".", "acquire_input_focus")

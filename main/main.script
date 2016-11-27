@@ -3,7 +3,7 @@
 -- © 2016 Roman "Megus" Petrov, Wise Hedgehog Studio.
 -- https://wisehedgehog.studio, https://megus.org
 
-local router = require("router.router")
+local router = require("wh_router.router")
 local routing = require("main.routing")
 
 function init(self)
