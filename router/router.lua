@@ -3,11 +3,14 @@
 -- © 2016 Roman "Megus" Petrov, Wise Hedgehog Studio.
 -- https://wisehedgehog.studio, https://megus.org
 
-local M = {
-    messages = {
-        scene_input = hash("scene_input"),
-        scene_popped = hash("scene_popped")
-    }
+--- Router module
+-- @module M
+local M = {}
+
+--- Router message hashes
+M.messages = {
+    scene_input = hash("scene_input"),      -- scene input message
+    scene_popped = hash("scene_popped")     -- scene popped message
 }
 
 ----------------------------------------------------------------------------------------------------
@@ -23,29 +26,22 @@ local methods = {
     restore = 4,
 }
 
+-- Internal routing tables storage
 local routing_tables = {}
 
---- Returns scene controller URL string
--- You should use the same names for your scene controllers
--- @tparam string name Scene name
--- @treturn string Scene controller URL
+-- Returns scene controller URL string
 local function scene_controller_url(self, name)
     return name .. ":/" .. self.scene_controller_path
 end
 
---- Unload a scene
--- Just a handy function because we need it twice
--- @tparam string url Scene URL
+-- Unload a scene
 local function unload_scene(url)
     msg.post(url, "disable")
     msg.post(url, "final")
     msg.post(url, "unload")
 end
 
---- Puts the next scene to the scene stack and loads it
--- @tparam tab self Router data
--- @tparam number method One of methods constants
--- @tparam tab message Message table
+-- Puts the next scene to the scene stack and loads it
 local function next_scene(self, method, message)
     local scene
 
@@ -84,6 +80,11 @@ end
 -- Public interface
 ----------------------------------------------------------------------------------------------------
 
+--- Create new Router object
+-- @treturn table Router object
+-- @tparam table routing Routing table (state machine)
+-- @tparam string router_url Script with the router URL string
+-- @tparam string scene_controller_path Path to scene controller scripts
 function M.new(routing, router_url, scene_controller_path)
     -- Init scene stack and scene state storage
     local self = {
@@ -92,12 +93,20 @@ function M.new(routing, router_url, scene_controller_path)
         router_url = router_url,
         scene_controller_path = scene_controller_path
     }
+    -- Save routing table in the internal storage. We do it this way because you can't passed
+    -- function references with msg.post
     routing_tables[self] = routing
     -- Load the first scene
     next_scene(self, methods.switch)
     return self
 end
 
+--- Router message handler
+-- Call this handler from your root scene on_message function
+-- @tparam table self Router object
+-- @tparam hash message_id Message ID
+-- @tparam table message Message table
+-- @param sender Message sender
 function M.on_message(self, message_id, message, sender)
     -- A new scene is loaded
     if message_id == hash("proxy_loaded") then
@@ -169,6 +178,7 @@ end
 -- When the pushed scene is closed, the current scene will receive "scene_popped"
 -- message with the output of the pushed scene and the state of the current scene
 -- so it can restore its state. "scene_input" message will not be sent.
+-- @tparam table self Router object
 -- @tparam string scene_name Name of the new scene
 -- @tparam table input Input for the new scene (optional)
 -- @tparam table state State of the current scene (optional)
@@ -182,6 +192,7 @@ end
 -- (it will disappear from the screen). When the pushed scene is closed,
 -- the current scene will receive "scene_popped" message with the output of
 -- the pushed scene. State saving is not required for this method.
+-- @tparam table self Router object
 -- @tparam string scene_name Name of the new scene
 -- @tparam table input Input for the new scene (optional)
 function M.push_modal(self, scene_name, input)
@@ -194,6 +205,7 @@ end
 -- When the pushed scene is closed, the current scene will receive "scene_popped"
 -- message with the output of the pushed scene. The input focus will be acquired again.
 -- State saving is not required for this method
+-- @tparam table self Router object
 -- @tparam string scene_name Name of the new scene
 -- @tparam table input Input for the new scene (optional)
 function M.popup(self, scene_name, input)
@@ -206,6 +218,7 @@ end
 -- scene was displayed. For push, push_modal and popup methods this output will be
 -- passed directly to the previous scene. If this scene was displayed according to
 -- routing rules, the output will be passed to corresponding routing function.
+-- @tparam table self Router object
 -- @tparam table output The output of the current scene (optional)
 -- @tparam table state State of the scene (optional)
 function M.close(self, output, state)
