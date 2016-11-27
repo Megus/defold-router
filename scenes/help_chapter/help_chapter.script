@@ -1,13 +1,19 @@
-local router_helper = require("main.router_helper")
+-- Defold Router Demo Project
+--
+-- © 2016 Roman "Megus" Petrov, Wise Hedgehog Studio.
+-- https://wisehedgehog.studio, https://megus.org
+
+local router = require("router.router")
 
 function init(self)
     msg.post(".", "acquire_input_focus")
 end
 
 function on_message(self, message_id, message, sender)
-    if message_id == hash("scene_input") then
+    if message_id == router.messages.scene_input then
+        self.router = message.router
         msg.post("gui", "set_title", {title = "Chapter " .. message.input.chapter})
     elseif message_id == hash("back") then
-        router_helper.close_scene()
+        router.close(self.router)
     end
 end

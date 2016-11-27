@@ -1,25 +1,31 @@
-local router_helper = require("main.router_helper")
+-- Defold Router Demo Project
+--
+-- © 2016 Roman "Megus" Petrov, Wise Hedgehog Studio.
+-- https://wisehedgehog.studio, https://megus.org
+
+local router = require("router.router")
 
 function init(self)
     msg.post(".", "acquire_input_focus")
 end
 
 function on_message(self, message_id, message, sender)
-    if message_id == hash("scene_input") then
+    if message_id == router.messages.scene_input then
+        self.router = message.router
         self.world = message.input.world
         self.level = message.input.level
         msg.post("gui", "show_level_number", {world = self.world, level = self.level})
+    elseif message_id == router.messages.scene_popped then
+        msg.post("gui", "enable")
     elseif message_id == hash("settings") then
         msg.post("gui", "disable")
-        router_helper.popup("settings")
-    elseif message_id == hash("scene_popped") then
-        msg.post("gui", "enable")
+        router.popup(self.router, "settings")
     elseif message_id == hash("win") then
-        router_helper.close_scene({win = true, world = self.world, level = self.level}, state)
+        router.close(self.router, {win = true, world = self.world, level = self.level}, state)
     elseif message_id == hash("fail") then
-        router_helper.close_scene({win = false, world = self.world, level = self.level}, state)
+        router.close(self.router, {win = false, world = self.world, level = self.level}, state)
     elseif message_id == hash("help") then
         msg.post("gui", "disable")
-        router_helper.push_modal("help")
+        router.push_modal(self.router, "help")
     end
 end

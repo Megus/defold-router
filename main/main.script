@@ -1,0 +1,19 @@
+-- Defold Router: The main script with all routing methods implementation
+--
+-- © 2016 Roman "Megus" Petrov, Wise Hedgehog Studio.
+-- https://wisehedgehog.studio, https://megus.org
+
+local router = require("router.router")
+local routing = require("main.routing")
+
+function init(self)
+    msg.post(".", "acquire_input_focus")
+    -- Create the router with the main routing table. It will automatically load the first scene
+    self.router = router.new(routing, "main:/scenes#router", "controller#script")
+end
+
+function on_message(self, message_id, message, sender)
+    -- Handle router messages
+    router.on_message(self.router, message_id, message, sender)
+    -- You can continue to handle other messages here, of course
+end

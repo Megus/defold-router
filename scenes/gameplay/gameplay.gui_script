@@ -1,3 +1,8 @@
+-- Defold Router Demo Project
+--
+-- © 2016 Roman "Megus" Petrov, Wise Hedgehog Studio.
+-- https://wisehedgehog.studio, https://megus.org
+
 function init(self)
     msg.post(".", "acquire_input_focus")
 end

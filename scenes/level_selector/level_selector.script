@@ -1,4 +1,9 @@
-local router_helper = require("main.router_helper")
+-- Defold Router Demo Project
+--
+-- © 2016 Roman "Megus" Petrov, Wise Hedgehog Studio.
+-- https://wisehedgehog.studio, https://megus.org
+
+local router = require("router.router")
 
 function init(self)
     msg.post(".", "acquire_input_focus")
@@ -13,7 +18,8 @@ local function set_state(self, state)
 end
 
 function on_message(self, message_id, message, sender)
-    if message_id == hash("scene_input") then
+    if message_id == router.messages.scene_input then
+        self.router = message.router
         set_state(self, message.state)
         if message.input and message.input.win ~= nil then
             if message.input.win then
@@ -24,17 +30,17 @@ function on_message(self, message_id, message, sender)
         end
         msg.post("gui", "highlight_world", {world = self.state.world})
         msg.post("gui", "set_info", {text = "Wins: " .. self.state.wins .. ", Fails: " .. self.state.fails})
+    elseif message_id == router.messages.scene_popped then
+        msg.post("gui", "enable")
     elseif message_id == hash("close") then
-        router_helper.close_scene(nil, self.state)
+        router.close(self.router, nil, self.state)
     elseif message_id == hash("settings") then
         msg.post("gui", "disable")
-        router_helper.popup("settings")
+        router.popup(self.router, "settings")
     elseif message_id == hash("select_world") then
         self.state.world = message.world
         msg.post("gui", "highlight_world", {world = self.state.world})
     elseif message_id == hash("select_level") then
-        router_helper.close_scene({world = self.state.world, level = message.level}, self.state)
-    elseif message_id == hash("scene_popped") then
-        msg.post("gui", "enable")
+        router.close(self.router, {world = self.state.world, level = message.level}, self.state)
     end
 end
