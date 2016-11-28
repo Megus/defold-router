@@ -21,6 +21,8 @@ This router gives you several navigation methods:
 
 The demo project contains code samples for all possible Router use cases.
 
+[Try demo project online](https://megus.github.io/defold-router).
+
 ## Setup
 
 Add the library zip URL as a [dependency](http://www.defold.com/manuals/libraries/#_setting_up_library_dependencies) to your Defold project: [https://github.com/Megus/defold-router/archive/master.zip](https://github.com/Megus/defold-router/archive/master.zip)
