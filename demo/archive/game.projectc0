@@ -1,0 +1,24 @@
+[project]
+title = Defold Router Demo
+version = 0.1
+
+[bootstrap]
+main_collection = /main/main.collectionc
+
+[input]
+game_binding = /input/game.input_bindingc
+
+[display]
+width = 800
+height = 600
+high_dpi = 1
+
+[physics]
+scale = 0.02
+
+[script]
+shared_state = 1
+
+[library]
+include_dirs = wh_router
+
