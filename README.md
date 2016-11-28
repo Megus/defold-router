@@ -2,6 +2,14 @@
 
 A powerful UI router for games built with [Defold Game Engine](http://www.defold.com).
 
+## Table of Contents
+
+- [Setup](#setup)
+- [Setting up the navigation](#setting-up-the-navigation)
+    - [Routing table](#routing-table)
+    - [Using the navigation stack](#using-the-navigation-stack)
+- [Handling Router messages in collection scripts](#handling-router-messages-in-collection-scripts)
+
 Just like a lot of Defold newbies, I've quickly found out that there are no standard functions to implement complex navigation between game screens in Defold. The provided examples only show the general idea of switching screens with collection proxies but your game usually has more than just two screens. So I came up with an idea to develop a reusable navigation solution. I took the inspiration from ```UINavigationContoller``` in iOS and React/Redux.
 
 This router gives you several navigation methods:
@@ -12,9 +20,7 @@ This router gives you several navigation methods:
 
 The demo project contains code samples for all possible Router use cases.
 
-## How to use
-
-### Setup
+## Setup
 
 Add the library zip URL as a [dependency](http://www.defold.com/manuals/libraries/#_setting_up_library_dependencies) to your Defold project: [https://github.com/Megus/defold-router/archive/master.zip](https://github.com/Megus/defold-router/archive/master.zip)
 
@@ -60,7 +66,7 @@ Function ```router.new``` accepts three parameters:
 
 Now you can try to run your project and see that your first scene is loaded!
 
-### Setting up the navigation
+## Setting up the navigation
 
 The Router treats each scene as a function which has some input parameters and returns some output. This approach is used to decouple scenes as much as possible. Scenes can have an internal state that can be persisted between scene launches. The Router will store these states.
 
@@ -71,7 +77,7 @@ There are four ways to change scenes:
 - Pushing a new scene to the stack with keeping the current scene.
 - Showing a popup scene with keeping the current scene.
 
-#### Routing table
+### Routing table
 
 Routing table defines the rules of switching between scenes. It works as a state machine where states are your scene names. When you close a scene that was displayed using routing table, Router will call a function with the same name as your scene and pass the scene output to it. This function can analyze scene output to decide which scene should be displayed next. The function returns the name of the next scene and the input table for it (input is optional).
 
@@ -90,9 +96,9 @@ function M.level_selector(output)
 end
 ```
 
-#### Using the navigation stack
+### Using the navigation stack
 
-##### Push the scene
+#### Push the scene
 
 ```lua
 router.push(router_object, scene_name, input, state)
@@ -102,7 +108,7 @@ Pushes the new scene to the stack and passes the input to it. The current scene 
 
 Parameters ```input``` and ```state``` are optional.
 
-##### Push the modal scene
+#### Push the modal scene
 
 ```lua
 router.push_modal(router_object, scene_name, input)
@@ -112,7 +118,7 @@ Pushes the new scene to the stack and passes the input to it. The current scene 
 
 Parameter ```input``` is optional.
 
-##### Show popup
+#### Show popup
 
 ```lua
 router.popup(router_object, scene_name, input)
@@ -120,7 +126,7 @@ router.popup(router_object, scene_name, input)
 
 Pushed the new scene to the stack and passes the input to it. The current scene is kept in memory but the input focus will be revoked. When the popup scene is closed, the current scene will get input focus back and receive the output of the popup scene.
 
-#### Close scene
+### Close scene
 
 ```lua
 router.close(router_object, output, state)
@@ -128,7 +134,7 @@ router.close(router_object, output, state)
 
 When the scene is finished, you need to close it. You can pass the output to the router and save scene state. Both ```output``` and ```state``` parameters are optional.
 
-### Handling Router messages in collection scripts
+## Handling Router messages in collection scripts
 
 You need to handle two Router messages in your scene controller scripts: ```router.messages.scene_input``` and ```router.messages.scene_popped```. Handling the first one is mandatory, the second one should be handled only if you use ```push```, ```push_modal``` or ```popup``` Router functions in this scene.
 
