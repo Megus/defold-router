@@ -316,7 +316,7 @@ nodes {
   }
   type: TYPE_TEXT
   blend_mode: BLEND_MODE_ALPHA
-  text: "This scene was displayed with \"scene_push_modal\" message. The previous scene is still loaded but disabled. You can use this method to show fullscreen scenes while keeping the previous scene in memory. It is useful if that scene has complex state (e.g. gameplay scene) and using state to restore it will be too complicated."
+  text: "This scene was displayed with \"router.push_modal\" function. The previous scene is still loaded but disabled. You can use this method to show fullscreen scenes while keeping the previous scene in memory. It is useful if that scene has complex state (e.g. gameplay scene) and using state to restore it will be too complicated."
   font: "text"
   id: "text/text"
   xanchor: XANCHOR_NONE

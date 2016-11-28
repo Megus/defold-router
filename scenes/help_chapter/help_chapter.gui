@@ -488,7 +488,7 @@ nodes {
   }
   type: TYPE_TEXT
   blend_mode: BLEND_MODE_ALPHA
-  text: "This scene was displayed with \"scene_push\" message, the previous scene was unloaded. You can use this method to implement navigation stack while saving memory. Use states to restore previous scene."
+  text: "This scene was displayed with \"router.push\" function, the previous scene was unloaded. You can use this method to implement navigation stack while saving memory. Use states to restore previous scene."
   font: "text"
   id: "text/text"
   xanchor: XANCHOR_NONE

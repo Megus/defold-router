@@ -496,7 +496,7 @@ nodes {
   }
   type: TYPE_TEXT
   blend_mode: BLEND_MODE_ALPHA
-  text: "This is the first scene, it is defined by \"first_scene\" method in the routing table. You can also pass input to it."
+  text: "This is the first scene, it is defined by \"first_scene\" function in the routing table. You can also pass input to it."
   font: "text"
   id: "label/text"
   xanchor: XANCHOR_NONE

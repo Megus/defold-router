@@ -9,13 +9,21 @@ local M = {}
 
 --- Router message hashes
 M.messages = {
-    scene_input = hash("scene_input"),      -- scene input message
-    scene_popped = hash("scene_popped")     -- scene popped message
+    scene_input = hash("wh_router_scene_input"),      -- scene input message
+    scene_popped = hash("wh_router_scene_popped")     -- scene popped message
 }
 
 ----------------------------------------------------------------------------------------------------
 -- Private interface
 ----------------------------------------------------------------------------------------------------
+
+-- Router messages
+local messages = {
+    push = hash("wh_router_scene_push"),
+    push_modal = hash("wh_router_scene_push_modal"),
+    popup = hash("wh_router_scene_popup"),
+    close = hash("wh_router_scene_close")
+}
 
 -- Scene display methods
 local methods = {
@@ -23,7 +31,7 @@ local methods = {
     push = 1,
     push_modal = 2,
     popup = 3,
-    restore = 4,
+    restore = 4
 }
 
 -- Internal routing tables storage
@@ -71,7 +79,7 @@ local function next_scene(self, method, message)
     end
     -- Push the next scene to the stack
     table.insert(self.stack, scene)
-    msg.post("scenes#" .. scene.name, "load")
+    msg.post("#" .. scene.name, "load")
 end
 
 
@@ -131,26 +139,26 @@ function M.on_message(self, message_id, message, sender)
     	msg.post(sender, "enable")
         -- Pass the input to the new scene
         if not current.restored then
-            msg.post(scene_controller_url(self, current.name), "scene_input",
+            msg.post(scene_controller_url(self, current.name), M.messages.scene_input,
                 {router = self, input = current.input, state = self.states[current.name]})
         else
-            msg.post(scene_controller_url(self, current.name), "scene_popped",
+            msg.post(scene_controller_url(self, current.name), M.messages.scene_popped,
                 {router = self, output = current.output, state = self.states[current.name]})
         end
     -- Scene is unloaded
     elseif message_id == hash("proxy_unloaded") then
         -- Currently we don't need to do anything here
     -- Handle scene modal push
-    elseif message_id == hash("scene_push_modal") then
+    elseif message_id == messages.push_modal then
         next_scene(self, methods.push_modal, message)
     -- Handle scene popup
-    elseif message_id == hash("scene_popup") then
+    elseif message_id == messages.popup then
         next_scene(self, methods.popup, message)
     -- Handle scene push
-    elseif message_id == hash("scene_push") then
+    elseif message_id == messages.push then
         next_scene(self, methods.push, message)
     -- Handle scene close
-    elseif message_id == hash("scene_close") then
+    elseif message_id == messages.close then
         local current = self.stack[#self.stack]
         -- This scene appeared by switching, the state-machine will be used
         if current.method == methods.switch then
@@ -168,7 +176,7 @@ function M.on_message(self, message_id, message, sender)
             else
                 msg.post("#" .. previous.name, "enable")
             end
-            msg.post(scene_controller_url(self, previous.name), "scene_popped", {router = self, output = message.output})
+            msg.post(scene_controller_url(self, previous.name), M.messages.scene_popped, {router = self, output = message.output})
         end
     end
 end
@@ -183,7 +191,7 @@ end
 -- @tparam table input Input for the new scene (optional)
 -- @tparam table state State of the current scene (optional)
 function M.push(self, scene_name, input, state)
-    msg.post(self.router_url, "scene_push",
+    msg.post(self.router_url, messages.push,
         {scene_name = scene_name, input = input, state = state})
 end
 
@@ -196,7 +204,7 @@ end
 -- @tparam string scene_name Name of the new scene
 -- @tparam table input Input for the new scene (optional)
 function M.push_modal(self, scene_name, input)
-    msg.post(self.router_url, "scene_push_modal",
+    msg.post(self.router_url, messages.push_modal,
         {scene_name = scene_name, input = input})
 end
 
@@ -209,7 +217,7 @@ end
 -- @tparam string scene_name Name of the new scene
 -- @tparam table input Input for the new scene (optional)
 function M.popup(self, scene_name, input)
-    msg.post(self.router_url, "scene_popup",
+    msg.post(self.router_url, messages.popup,
         {scene_name = scene_name, input = input})
 end
 
@@ -222,7 +230,7 @@ end
 -- @tparam table output The output of the current scene (optional)
 -- @tparam table state State of the scene (optional)
 function M.close(self, output, state)
-    msg.post(self.router_url, "scene_close",
+    msg.post(self.router_url, messages.close,
         {output = output, state = state})
 end
 
