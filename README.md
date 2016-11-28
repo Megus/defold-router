@@ -8,6 +8,7 @@ A powerful UI router for games built with [Defold Game Engine](http://www.defold
 - [Setting up the navigation](#setting-up-the-navigation)
     - [Routing table](#routing-table)
     - [Using the navigation stack](#using-the-navigation-stack)
+    - [Close scene](#close-scene)
 - [Handling Router messages in collection scripts](#handling-router-messages-in-collection-scripts)
 
 Just like a lot of Defold newbies, I've quickly found out that there are no standard functions to implement complex navigation between game screens in Defold. The provided examples only show the general idea of switching screens with collection proxies but your game usually has more than just two screens. So I came up with an idea to develop a reusable navigation solution. I took the inspiration from ```UINavigationContoller``` in iOS and React/Redux.
