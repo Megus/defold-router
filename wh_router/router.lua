@@ -168,7 +168,7 @@ function M.on_message(self, message_id, message, sender)
             next_scene(self, methods.restore, message)
         -- It was modally pushed scene, unload it and enable the previous one
         elseif current.method == methods.push_modal or current.method == methods.popup then
-            unload_scene("#" .. self.stack[#self.stack].name)
+            unload_scene("#" .. current.name)
             table.remove(self.stack)
             local previous = self.stack[#self.stack]
             if current.method == methods.popup then
@@ -176,7 +176,7 @@ function M.on_message(self, message_id, message, sender)
             else
                 msg.post("#" .. previous.name, "enable")
             end
-            msg.post(scene_controller_url(self, previous.name), M.messages.scene_popped, {router = self, output = message.output})
+            msg.post(scene_controller_url(self, previous.name), M.messages.scene_popped, {router = self, output = message.output, name = current.name})
         end
     end
 end
