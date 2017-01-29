@@ -79,7 +79,7 @@ local function next_scene(self, method, message)
     end
     -- Push the next scene to the stack
     table.insert(self.stack, scene)
-    msg.post("#" .. scene.name, "load")
+    msg.post("#" .. scene.name, "async_load")
 end
 
 
