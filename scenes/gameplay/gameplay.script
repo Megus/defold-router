@@ -21,9 +21,9 @@ function on_message(self, message_id, message, sender)
         msg.post("gui", "disable")
         router.popup(self.router, "settings")
     elseif message_id == hash("win") then
-        router.close(self.router, {win = true, world = self.world, level = self.level}, state)
+        router.close(self.router, {win = true, world = self.world, level = self.level})
     elseif message_id == hash("fail") then
-        router.close(self.router, {win = false, world = self.world, level = self.level}, state)
+        router.close(self.router, {win = false, world = self.world, level = self.level})
     elseif message_id == hash("help") then
         msg.post("gui", "disable")
         router.push_modal(self.router, "help")
