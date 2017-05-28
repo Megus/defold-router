@@ -53,6 +53,7 @@ end
 -- Puts the next scene to the scene stack and loads it
 local function next_scene(ro, method, message)
     local scene
+    local sync = true
 
     if method == methods.switch then
         -- Switch a scene, use the state machine to get the next scene
@@ -70,6 +71,7 @@ local function next_scene(ro, method, message)
             ro.states[ro.stack[#ro.stack].name] = message.state
         end
         scene = {name = message.scene_name, input = message.input, method = method}
+        sync = message.sync
     elseif method == methods.restore then
         -- Restore the previous scene
         local previous = ro.stack[#ro.stack - 1]
@@ -80,7 +82,7 @@ local function next_scene(ro, method, message)
     end
     -- Push the next scene to the stack
     table.insert(ro.stack, scene)
-    msg.post("#" .. scene.name, "async_load")
+    msg.post("#" .. scene.name, sync and "load" or "async_load")
 end
 
 
@@ -183,7 +185,7 @@ function M.on_message(router_id, message_id, message, sender)
     end
 end
 
---- Push the new scene to scene stack
+--- Push the new scene to scene stack synchrounously
 -- The current scene will be unloaded and its state will be saved.
 -- When the pushed scene is closed, the current scene will receive "scene_popped"
 -- message with the output of the pushed scene and the state of the current scene
@@ -192,13 +194,34 @@ end
 -- @tparam string scene_name Name of the new scene
 -- @tparam table input Input for the new scene (optional)
 -- @tparam table state State of the current scene (optional)
-function M.push(router_id, scene_name, input, state)
+function M.push_sync(router_id, scene_name, input, state)
     local ro = router_objects[router_id]
     msg.post(ro.router_url, messages.push,
-        {scene_name = scene_name, input = input, state = state})
+        {scene_name = scene_name, input = input, state = state, sync = true})
 end
 
---- Push the new scene modally
+--- Push the new scene to scene stack asynchronously
+-- The current scene will be unloaded and its state will be saved.
+-- When the pushed scene is closed, the current scene will receive "scene_popped"
+-- message with the output of the pushed scene and the state of the current scene
+-- so it can restore its state. "scene_input" message will not be sent.
+-- @tparam string router_id Router ID
+-- @tparam string scene_name Name of the new scene
+-- @tparam table input Input for the new scene (optional)
+-- @tparam table state State of the current scene (optional)
+function M.push_async(router_id, scene_name, input, state)
+    local ro = router_objects[router_id]
+    msg.post(ro.router_url, messages.push,
+        {scene_name = scene_name, input = input, state = state, sync = false})
+end
+
+--- Compatibility alias for push_sync
+function M.push(router_id, scene_name, input, state)
+    M.push_sync(router_id, scene_name, input, state)
+end
+
+
+--- Push the new modal scene synchrounously
 -- The current scene will not be unloaded but will be disabled
 -- (it will disappear from the screen). When the pushed scene is closed,
 -- the current scene will receive "scene_popped" message with the output of
@@ -206,13 +229,32 @@ end
 -- @tparam string router_id Router ID
 -- @tparam string scene_name Name of the new scene
 -- @tparam table input Input for the new scene (optional)
-function M.push_modal(router_id, scene_name, input)
+function M.push_modal_sync(router_id, scene_name, input)
     local ro = router_objects[router_id]
     msg.post(ro.router_url, messages.push_modal,
-        {scene_name = scene_name, input = input})
+        {scene_name = scene_name, input = input, sync = true})
 end
 
---- Show popup scene
+--- Push the new modal scene asynchrounously
+-- The current scene will not be unloaded but will be disabled
+-- (it will disappear from the screen). When the pushed scene is closed,
+-- the current scene will receive "scene_popped" message with the output of
+-- the pushed scene. State saving is not required for this method.
+-- @tparam string router_id Router ID
+-- @tparam string scene_name Name of the new scene
+-- @tparam table input Input for the new scene (optional)
+function M.push_modal_async(router_id, scene_name, input)
+    local ro = router_objects[router_id]
+    msg.post(ro.router_url, messages.push_modal,
+        {scene_name = scene_name, input = input, sync = false})
+end
+
+--- Compatibility alias for push_modal_sync
+function M.push_modal(router_id, scene_name, input)
+    M.push_modal_sync(router_id, scene_name, input)
+end
+
+--- Show popup scene synchrounously
 -- The current scene will not be unloaded but the input will be disabled.
 -- When the pushed scene is closed, the current scene will receive "scene_popped"
 -- message with the output of the pushed scene. The input focus will be acquired again.
@@ -220,10 +262,29 @@ end
 -- @tparam string router_id Router ID
 -- @tparam string scene_name Name of the new scene
 -- @tparam table input Input for the new scene (optional)
-function M.popup(router_id, scene_name, input)
+function M.popup_sync(router_id, scene_name, input)
     local ro = router_objects[router_id]
     msg.post(ro.router_url, messages.popup,
-        {scene_name = scene_name, input = input})
+        {scene_name = scene_name, input = input, sync = true})
+end
+
+--- Show popup scene asynchrounously
+-- The current scene will not be unloaded but the input will be disabled.
+-- When the pushed scene is closed, the current scene will receive "scene_popped"
+-- message with the output of the pushed scene. The input focus will be acquired again.
+-- State saving is not required for this method
+-- @tparam string router_id Router ID
+-- @tparam string scene_name Name of the new scene
+-- @tparam table input Input for the new scene (optional)
+function M.popup_async(router_id, scene_name, input)
+    local ro = router_objects[router_id]
+    msg.post(ro.router_url, messages.popup,
+        {scene_name = scene_name, input = input, sync = false})
+end
+
+--- Compatibility alias for popup_sync
+function M.popup(router_id, scene_name, input)
+    M.popup_sync(router_id, scene_name, input)
 end
 
 --- Close the current scene
