@@ -37,21 +37,12 @@ nodes {
     w: 1.0
   }
   type: TYPE_TEMPLATE
-  blend_mode: BLEND_MODE_ALPHA
   id: "text"
-  xanchor: XANCHOR_NONE
-  yanchor: YANCHOR_NONE
-  pivot: PIVOT_CENTER
-  adjust_mode: ADJUST_MODE_FIT
   layer: ""
   inherit_alpha: true
-  clipping_mode: CLIPPING_MODE_NONE
-  clipping_visible: true
-  clipping_inverted: false
   alpha: 1.0
   template: "/common/label.gui"
   template_node_child: false
-  size_mode: SIZE_MODE_AUTO
 }
 nodes {
   position {
@@ -165,9 +156,6 @@ nodes {
   parent: "text/box"
   layer: ""
   inherit_alpha: true
-  clipping_mode: CLIPPING_MODE_NONE
-  clipping_visible: true
-  clipping_inverted: false
   alpha: 1.0
   outline_alpha: 1.0
   shadow_alpha: 1.0
@@ -175,7 +163,6 @@ nodes {
   template_node_child: true
   text_leading: 1.0
   text_tracking: 0.0
-  size_mode: SIZE_MODE_AUTO
 }
 nodes {
   position {
@@ -209,21 +196,12 @@ nodes {
     w: 1.0
   }
   type: TYPE_TEMPLATE
-  blend_mode: BLEND_MODE_ALPHA
   id: "ok"
-  xanchor: XANCHOR_NONE
-  yanchor: YANCHOR_NONE
-  pivot: PIVOT_CENTER
-  adjust_mode: ADJUST_MODE_FIT
   layer: ""
   inherit_alpha: true
-  clipping_mode: CLIPPING_MODE_NONE
-  clipping_visible: true
-  clipping_inverted: false
   alpha: 1.0
   template: "/common/label.gui"
   template_node_child: false
-  size_mode: SIZE_MODE_AUTO
 }
 nodes {
   position {
@@ -337,9 +315,6 @@ nodes {
   parent: "ok/box"
   layer: ""
   inherit_alpha: true
-  clipping_mode: CLIPPING_MODE_NONE
-  clipping_visible: true
-  clipping_inverted: false
   alpha: 1.0
   outline_alpha: 1.0
   shadow_alpha: 1.0
@@ -347,7 +322,6 @@ nodes {
   template_node_child: true
   text_leading: 1.0
   text_tracking: 0.0
-  size_mode: SIZE_MODE_AUTO
 }
 nodes {
   position {
@@ -381,21 +355,12 @@ nodes {
     w: 1.0
   }
   type: TYPE_TEMPLATE
-  blend_mode: BLEND_MODE_ALPHA
   id: "label"
-  xanchor: XANCHOR_NONE
-  yanchor: YANCHOR_NONE
-  pivot: PIVOT_CENTER
-  adjust_mode: ADJUST_MODE_FIT
   layer: ""
   inherit_alpha: true
-  clipping_mode: CLIPPING_MODE_NONE
-  clipping_visible: true
-  clipping_inverted: false
   alpha: 1.0
   template: "/common/label.gui"
   template_node_child: false
-  size_mode: SIZE_MODE_AUTO
 }
 nodes {
   position {
@@ -509,9 +474,6 @@ nodes {
   parent: "label/box"
   layer: ""
   inherit_alpha: true
-  clipping_mode: CLIPPING_MODE_NONE
-  clipping_visible: true
-  clipping_inverted: false
   alpha: 1.0
   outline_alpha: 1.0
   shadow_alpha: 1.0
@@ -521,7 +483,6 @@ nodes {
   template_node_child: true
   text_leading: 1.0
   text_tracking: 0.0
-  size_mode: SIZE_MODE_AUTO
 }
 material: "/builtins/materials/gui.material"
 adjust_reference: ADJUST_REFERENCE_PARENT

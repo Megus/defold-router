@@ -4,12 +4,12 @@
 -- https://wisehedgehog.studio, https://megus.org
 
 local router = require("wh_router.router")
-local routing = require("main.routing")
+local scenes = require("main.scenes")
 
 function init(self)
     msg.post(".", "acquire_input_focus")
     -- Create the router with the main routing table. It will automatically load the first scene
-    self.router = router.new(routing, "main:/scenes#router", "controller#script")
+    self.router = router.new(scenes, "main:/scenes#router", "controller#script")
 end
 
 function on_message(self, message_id, message, sender)
