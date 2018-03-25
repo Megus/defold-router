@@ -25,6 +25,8 @@ local messages = {
 	close = hash("wh_router_scene_close")
 }
 
+local msg_proxy_loaded = hash("proxy_loaded")
+
 -- Scene display methods
 local methods = {
 	switch = 0,
@@ -40,13 +42,6 @@ local router_objects = {}
 -- Returns scene controller URL string
 local function scene_controller_url(ro, name)
 	return name .. ":/" .. ro.scene_controller_path
-end
-
--- Unload a scene
-local function unload_scene(url)
-	msg.post(url, "disable")
-	msg.post(url, "final")
-	msg.post(url, "unload")
 end
 
 -- Get scene info
@@ -66,6 +61,10 @@ local function scene_info(ro, scene_name)
 	return info
 end
 
+local function top_scene(ro)
+	return #ro.stack ~= 0 and ro.stack[#ro.stack] or nil
+end
+
 local function get_next_scene(ro, current, output)
 	local route = current and ro.scenes.routing[current] or ro.scenes.first_scene
 	assert(route, current and "Can't get the scene next to [" .. current .. "]" or "First scene is not set")
@@ -80,117 +79,132 @@ local function get_next_scene(ro, current, output)
 	end
 end
 
--- Puts the next scene to the scene stack and loads it
-local function show_next_scene(ro, method, message)
-	local scene
+-- Unload a scene
+local function unload_scene(scene)
+	local url = "#" .. scene.name
+	msg.post(url, "disable")
+	msg.post(url, "final")
+	msg.post(url, "unload")
+end
 
-	if method == methods.switch then
-		-- Switch a scene, use the state machine to get the next scene
-		local current_name = #ro.stack ~= 0 and ro.stack[#ro.stack].name or nil
-		if current_name then
-			ro.states[current_name] = message.state
-		end
-		local next_name, input = get_next_scene(ro, current_name, message.output)
-		scene = {name = next_name, input = input, method = method}
-	elseif method == methods.push or method == methods.push_modal or method == methods.popup then
-		-- All these methods are pushing the new scene
-		if method == methods.push then
-			ro.states[ro.stack[#ro.stack].name] = message.state
-		end
-		scene = {name = message.scene_name, input = message.input, method = method}
-	elseif method == methods.restore then
-		-- Restore the previous scene
-		local previous = ro.stack[#ro.stack - 1]
-		scene = {name = previous.name, input = previous.input,
-			output = message.output, method = previous.method, restored = true}
-		-- Remove it for now, it will be pushed back below
-		table.remove(ro.stack, #ro.stack - 1)
-	end
-	-- Push the next scene to the stack
+local function init_scene(ro, scene, message, did_pop)
+	message.router = ro.router_url
+	message.state = ro.states[scene.name]
+
+	msg.post(scene_controller_url(ro, scene.name),
+		did_pop and M.messages.scene_popped or M.messages.scene_input,
+		message)
+
+	-- Start "in" transition of the new scene
+
+	-- Wait for transition to stop (do we need this?)
+	-- ro.wait_for = ...
+	-- coroutine.yield()
+end
+
+local function load_scene(ro, scene, previous, message, did_pop)
+	if did_pop == nil then did_pop = false end
+	-- Insert new scene to stack and start to load it
 	table.insert(ro.stack, scene)
 	local info = scene_info(ro, scene.name)
 	msg.post("#" .. scene.name, info.sync_load and "load" or "async_load")
+
+	-- Enable loading indicator, if needed
+
+	-- Wait for the scene to load
+	ro.wait_for = msg_proxy_loaded
+	coroutine.yield()
+
+	-- Unload previous scene
+	if previous then
+		unload_scene(previous)
+	end
+
+	-- Disable loading indicator, if needed
+
+	msg.post("#" .. scene.name, "enable")
+	init_scene(ro, scene, message, did_pop)
 end
 
+local function switch_scene(ro, current_output)
+	local current = top_scene(ro)
+	if current then table.remove(ro.stack, #ro.stack) end
+	local next_name, input = get_next_scene(ro, current and current.name or nil, current_output)
+	local scene = {name = next_name, method = methods.switch}
+	load_scene(ro, scene, current, {input = input})
+end
 
--- Message handling
-local message_handlers = {
-	-- A new scene is loaded
-	[hash("proxy_loaded")] = function(ro, _, sender)
-		local previous = (#ro.stack > 1) and ro.stack[#ro.stack - 1] or nil
-		local current = ro.stack[#ro.stack]
-		-- Unload the previous scene if needed
-		if previous and (current.method == methods.switch or current.method == methods.push or current.restored) then
-			unload_scene("#" .. previous.name)
-		-- Disable the previous scene on modal push
-		elseif current.method == methods.push_modal then
-			msg.post("#" .. previous.name, "disable")
-		-- Release input focus from the previous scene on popup
-		elseif current.method == methods.popup then
-			msg.post(scene_controller_url(ro, previous.name), "release_input_focus")
+local function push_scene(ro, scene_name, input, state)
+	local co = coroutine.create(function()
+		local current = top_scene(ro)
+		ro.states[scene_name] = state
+		local scene = {name = scene_name, method = methods.push}
+		load_scene(ro, scene, current, {input = input})
+		ro.co = nil
+	end)
+	ro.co = co
+	coroutine.resume(co)
+end
+
+local function push_modal_scene(ro, scene_name, input)
+	local co = coroutine.create(function()
+		local current = top_scene(ro)
+		msg.post("#" .. current.name, "disable")
+		local scene = {name = scene_name, method = methods.push_modal}
+		load_scene(ro, scene, nil, {input = input})
+		ro.co = nil
+	end)
+	ro.co = co
+	coroutine.resume(co)
+end
+
+local function popup_scene(ro, scene_name, input)
+	local co = coroutine.create(function()
+		local current = top_scene(ro)
+		local scene = {name = scene_name, method = methods.popup}
+		msg.post(scene_controller_url(ro, current.name), "release_input_focus")
+		load_scene(ro, scene, nil, {input = input})
+		ro.co = nil
+	end)
+	ro.co = co
+	coroutine.resume(co)
+end
+
+local function close_scene(ro, output, state)
+	local co = coroutine.create(function()
+		-- Save state
+		local scene = top_scene(ro)
+		ro.states[scene.name] = state
+		-- Start "out" transition of the current scene
+
+		-- Wait for transition to end
+
+		-- Now load next scene
+		if scene.method == methods.switch then
+			switch_scene(ro, output)
+		elseif scene.method == methods.push then
+			table.remove(ro.stack, #ro.stack)
+			local previous = top_scene(ro)
+			table.remove(ro.stack, #ro.stack)
+			load_scene(ro, previous, scene, {output = output}, true)
+		elseif scene.method == methods.push_modal then
+			table.remove(ro.stack, #ro.stack)
+			unload_scene(scene)
+			local previous = top_scene(ro)
+			msg.post("#" .. previous.name, "enable")
+			init_scene(ro, previous, {output = output}, true)
+		elseif scene.method == methods.popup then
+			table.remove(ro.stack, #ro.stack)
+			unload_scene(scene)
+			local previous = top_scene(ro)
+			init_scene(ro, previous, {output = output}, true)
+			msg.post(scene_controller_url(ro, previous.name), "acquire_input_focus")
 		end
-		-- Remove previous scene from the stack if it was a switch or the current scene was restored
-		if current.method == methods.switch or current.restored then
-			table.remove(ro.stack, #ro.stack - 1)
-		end
-		-- Init and enable new scene
-		msg.post(sender, "init")
-		msg.post(sender, "enable")
-		-- Pass the input to the new scene
-		if not current.restored then
-			msg.post(scene_controller_url(ro, current.name), M.messages.scene_input,
-				{router = ro.router_url, input = current.input, state = ro.states[current.name]})
-		else
-			msg.post(scene_controller_url(ro, current.name), M.messages.scene_popped,
-				{router = ro.router_url, output = current.output, state = ro.states[current.name]})
-		end
-	end,
-
-	-- Scene is unloaded
-	[hash("proxy_unloaded")] = function()
-		-- Currently we don't need to do anything here
-	end,
-
-	-- Handle scene push
-	[messages.push] = function(ro, message)
-		show_next_scene(ro, methods.push, message)
-	end,
-
-	-- Handle scene modal push
-	[messages.push_modal] = function(ro, message)
-		show_next_scene(ro, methods.push_modal, message)
-	end,
-
-	-- Handle scene popup
-	[messages.popup] = function(ro, message)
-		show_next_scene(ro, methods.popup, message)
-	end,
-
-	-- Handle scene close
-	[messages.close] = function(ro, message)
-		local current = ro.stack[#ro.stack]
-		-- This scene appeared by switching, the state-machine will be used
-		if current.method == methods.switch then
-			show_next_scene(ro, methods.switch, message)
-		-- It was a pushed scene, we need to restore the previous one
-		elseif current.method == methods.push then
-			show_next_scene(ro, methods.restore, message)
-		-- It was modally pushed scene, unload it and enable the previous one
-		elseif current.method == methods.push_modal or current.method == methods.popup then
-			unload_scene("#" .. current.name)
-			table.remove(ro.stack)
-			local previous = ro.stack[#ro.stack]
-			if current.method == methods.popup then
-				msg.post(scene_controller_url(ro, previous.name), "acquire_input_focus")
-			else
-				msg.post("#" .. previous.name, "enable")
-			end
-			msg.post(scene_controller_url(ro, previous.name),
-				M.messages.scene_popped,
-				{router = ro.router_url, output = message.output, name = current.name})
-		end
-	end
-}
+		ro.co = nil
+	end)
+	coroutine.resume(co)
+	ro.co = co
+end
 
 
 ----------------------------------------------------------------------------------------------------
@@ -205,6 +219,7 @@ local message_handlers = {
 function M.new(scenes, router_url, scene_controller_path)
 	assert(router_url, "router_url can't be nil")
 	assert(scene_controller_path, "scene_controller_path can't be nil")
+
 	-- Init scene stack and scene state storage
 	local ro = {
 		stack = {},
@@ -213,10 +228,12 @@ function M.new(scenes, router_url, scene_controller_path)
 		router_url = router_url,
 		scene_controller_path = scene_controller_path
 	}
-	-- Save router object and routing table in the internal storage.
 	router_objects[router_url] = ro
+
 	-- Load the first scene
-	show_next_scene(ro, methods.switch, {})
+	local co = coroutine.create(function() switch_scene(ro) end)
+	ro.co = co
+	coroutine.resume(co)
 	return router_url
 end
 
@@ -229,8 +246,18 @@ end
 function M.on_message(router_id, message_id, message, sender)
 	local ro = router_objects[router_id]
 	assert(ro, "Invalid router_id")
-	if message_handlers[message_id] then
-		message_handlers[message_id](ro, message, sender)
+
+	if message_id == ro.wait_for then
+		ro.wait_for = nil
+		coroutine.resume(ro.co, message, sender)
+	elseif message_id == messages.push then
+		push_scene(ro, message.scene_name, message.input, message.state)
+	elseif message_id == messages.push_modal then
+		push_modal_scene(ro, message.scene_name, message.input)
+	elseif message_id == messages.popup then
+		popup_scene(ro, message.scene_name, message.input)
+	elseif message_id == messages.close then
+		close_scene(ro, message.output, message.state)
 	end
 end
 
@@ -246,8 +273,7 @@ end
 function M.push(router_id, scene_name, input, state)
 	local ro = router_objects[router_id]
 	assert(ro, "Invalid router_id")
-	msg.post(ro.router_url, messages.push,
-		{scene_name = scene_name, input = input, state = state})
+	msg.post(ro.router_url, messages.push, {scene_name = scene_name, input = input, state = state})
 end
 
 --- Push the new modal scene
@@ -261,8 +287,7 @@ end
 function M.push_modal(router_id, scene_name, input)
 	local ro = router_objects[router_id]
 	assert(ro, "Invalid router_id")
-	msg.post(ro.router_url, messages.push_modal,
-		{scene_name = scene_name, input = input})
+	msg.post(ro.router_url, messages.push_modal, {scene_name = scene_name, input = input})
 end
 
 --- Show popup scene
@@ -276,8 +301,7 @@ end
 function M.popup(router_id, scene_name, input)
 	local ro = router_objects[router_id]
 	assert(ro, "Invalid router_id")
-	msg.post(ro.router_url, messages.popup,
-		{scene_name = scene_name, input = input})
+	msg.post(ro.router_url, messages.popup, {scene_name = scene_name, input = input})
 end
 
 --- Close the current scene
@@ -291,8 +315,7 @@ end
 function M.close(router_id, output, state)
 	local ro = router_objects[router_id]
 	assert(ro, "Invalid router_id")
-	msg.post(ro.router_url, messages.close,
-		{output = output, state = state})
+	msg.post(ro.router_url, messages.close, {output = output, state = state})
 end
 
 return M
