@@ -219,18 +219,18 @@ local function close_scene(ro, output, state)
 			table.remove(ro.stack, #ro.stack)
 			local previous = top_scene(ro)
 			table.remove(ro.stack, #ro.stack)
-			load_scene(ro, previous, scene, {output = output}, true)
+			load_scene(ro, previous, scene, {output = output, name = scene.name}, true)
 		elseif scene.method == methods.push_modal then
 			table.remove(ro.stack, #ro.stack)
 			unload_scene(scene)
 			local previous = top_scene(ro)
 			msg.post("#" .. previous.name, "enable")
-			init_scene(ro, previous, {output = output}, true, M.transition_types.t_back_in)
+			init_scene(ro, previous, {output = output, name = scene.name}, true, M.transition_types.t_back_in)
 		elseif scene.method == methods.popup then
 			table.remove(ro.stack, #ro.stack)
 			unload_scene(scene)
 			local previous = top_scene(ro)
-			init_scene(ro, previous, {output = output}, true, M.transition_types.t_none)
+			init_scene(ro, previous, {output = output, name = scene.name}, true, M.transition_types.t_none)
 			msg.post(scene_controller_url(ro, previous.name), "acquire_input_focus")
 		end
 		ro.co = nil
