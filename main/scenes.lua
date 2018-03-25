@@ -14,19 +14,24 @@ local M = {
         },
         level_selector = {
             has_transitions = true,
+            show_loading = true,
         },
         gameplay = {
             has_transitions = true,
             show_loading = true
         },
         fail = {
+            show_loading = true,
         },
         win = {
+            show_loading = true,
         },
         -- Popups
         help = {
+            show_loading = true,
         },
         help_chapter = {
+            show_loading = true,
         },
         settings = {
         }

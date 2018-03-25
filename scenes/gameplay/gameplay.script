@@ -21,7 +21,6 @@ function on_message(self, message_id, message, _)
         if message.t_type == router.transition_types.t_in or message.t_type == router.transition_types.t_back_in then
             msg.post("gui", "fade_in")
         else
-            print("fadeout")
             msg.post("gui", "fade_out")
         end
     elseif message_id == hash("fade_done") then

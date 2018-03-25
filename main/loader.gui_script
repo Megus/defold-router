@@ -1,0 +1,12 @@
+local router = require("wh_router.router")
+
+function on_message(_, message_id, message, _)
+	if message_id == router.messages.loader_start then
+		gui.set_color(gui.get_node("loading"), vmath.vector4(1, 1, 1, 1))
+	elseif message_id == router.messages.loader_stop then
+		gui.set_color(gui.get_node("loading"), vmath.vector4(1, 1, 1, 1))
+        gui.animate(gui.get_node("loading"), "color.w", 0, gui.EASING_LINEAR, 0.3, 0, function()
+			router.stopped_loader(message.router)
+        end)
+	end
+end

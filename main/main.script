@@ -9,7 +9,7 @@ local scenes = require("main.scenes")
 function init(self)
     msg.post(".", "acquire_input_focus")
     -- Create the router with the main routing table. It will automatically load the first scene
-    self.router_id = router.new(scenes, "main:/scenes#router", "controller#script")
+    self.router_id = router.new(scenes, "main:/scenes#router", "controller#script", "main:/loader")
 end
 
 function on_message(self, message_id, message, sender)

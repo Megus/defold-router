@@ -9,9 +9,11 @@ local M = {}
 
 --- Router message hashes
 M.messages = {
-	scene_input = hash("wh_router_scene_input"),      -- scene input message
-	scene_popped = hash("wh_router_scene_popped"),    -- scene popped message
-	transition = hash("wh_router_transition"),
+	scene_input = hash("wh_router_scene_input"),		-- scene input message
+	scene_popped = hash("wh_router_scene_popped"),		-- scene popped message
+	transition = hash("wh_router_transition"),			-- scene transition message
+	loader_start = hash("wh_router_start_loader"),		-- start loader message
+	loader_stop = hash("wh_router_stop_loader"),		-- stop loader message
 }
 
 M.transition_types = {
@@ -32,7 +34,8 @@ local messages = {
 	push_modal = hash("wh_router_scene_push_modal"),
 	popup = hash("wh_router_scene_popup"),
 	close = hash("wh_router_scene_close"),
-	finished_transition = hash("wh_router_finished_transition")
+	finished_transition = hash("wh_router_finished_transition"),
+	stopped_loader = hash("wh_router_stopped_loader")
 }
 
 local msg_proxy_loaded = hash("proxy_loaded")
@@ -91,23 +94,24 @@ local function get_next_scene(ro, current, output)
 end
 
 -- Unload a scene
-local function unload_scene(scene)
+local function unload_scene(scene, should_disable)
+	should_disable = should_disable == nil and true or false
 	local url = "#" .. scene.name
-	msg.post(url, "disable")
+	if should_disable then
+		msg.post(url, "disable")
+	end
 	msg.post(url, "final")
 	msg.post(url, "unload")
 end
 
 local function scene_transition(ro, scene, t_type)
 	if t_type == M.transition_types.t_none then return end
-	print("Transition " .. scene.name .. " " .. t_type)
 	local info = scene_info(ro, scene.name)
 	if info.has_transitions then
 		msg.post(scene_controller_url(ro, scene.name), M.messages.transition, {t_type = t_type})
 		ro.wait_for = messages.finished_transition
 		coroutine.yield()
 	end
-	print("Transition done")
 end
 
 -- Initialize scene
@@ -125,6 +129,13 @@ local function load_scene(ro, scene, previous, message, did_pop)
 	msg.post("#" .. scene.name, info.sync_load and "load" or "async_load")
 
 	-- Enable loading indicator, if needed
+	if info.show_loading and ro.loader_url then
+		if previous then
+			msg.post("#" .. previous.name, "disable")
+		end
+		msg.post(ro.loader_url, "enable")
+		msg.post(ro.loader_url, M.messages.loader_start, {router = ro.router_url})
+	end
 
 	-- Wait for the scene to load
 	ro.wait_for = msg_proxy_loaded
@@ -132,10 +143,16 @@ local function load_scene(ro, scene, previous, message, did_pop)
 
 	-- Unload previous scene
 	if previous then
-		unload_scene(previous)
+		unload_scene(previous, info.show_loading and ro.loader_url)
 	end
 
 	-- Disable loading indicator, if needed
+	if info.show_loading and ro.loader_url then
+		msg.post(ro.loader_url, M.messages.loader_stop, {router = ro.router_url})
+		ro.wait_for = messages.stopped_loader
+		coroutine.yield()
+		msg.post(ro.loader_url, "disable")
+	end
 
 	msg.post("#" .. scene.name, "enable")
 	init_scene(ro, scene, message, did_pop, did_pop and M.transition_types.t_back_in or M.transition_types.t_in)
@@ -165,9 +182,7 @@ end
 local function push_modal_scene(ro, scene_name, input)
 	local co = coroutine.create(function()
 		local current = top_scene(ro)
-		print("hi1")
 		scene_transition(ro, current, M.transition_types.t_out)
-		print("hi2")
 		msg.post("#" .. current.name, "disable")
 		local scene = {name = scene_name, method = methods.push_modal}
 		load_scene(ro, scene, nil, {input = input}, false)
@@ -234,7 +249,8 @@ end
 -- @tparam table Scene table
 -- @tparam string router_url Script with the router URL string
 -- @tparam string scene_controller_path Path to scene controller scripts
-function M.new(scenes, router_url, scene_controller_path)
+-- @tparam string loader_url URL of a loader component (optional, only if you use loaders)
+function M.new(scenes, router_url, scene_controller_path, loader_url)
 	assert(router_url, "router_url can't be nil")
 	assert(scene_controller_path, "scene_controller_path can't be nil")
 
@@ -244,14 +260,17 @@ function M.new(scenes, router_url, scene_controller_path)
 		states = {},
 		scenes = scenes,
 		router_url = router_url,
+		loader_url = loader_url,
 		scene_controller_path = scene_controller_path
 	}
 	router_objects[router_url] = ro
 
 	-- Load the first scene
-	local co = coroutine.create(function() switch_scene(ro) end)
-	ro.co = co
-	coroutine.resume(co)
+	if loader_url then
+		msg.post(loader_url, "disable")
+	end
+	ro.co = coroutine.create(function() switch_scene(ro) end)
+	coroutine.resume(ro.co)
 	return router_url
 end
 
@@ -340,6 +359,12 @@ function M.finished_transition(router_id)
 	local ro = router_objects[router_id]
 	assert(ro, "Invalid router_id")
 	msg.post(ro.router_url, messages.finished_transition)
+end
+
+function M.stopped_loader(router_id)
+	local ro = router_objects[router_id]
+	assert(ro, "Invalid router_id")
+	msg.post(ro.router_url, messages.stopped_loader)
 end
 
 return M
