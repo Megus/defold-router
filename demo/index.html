@@ -9,7 +9,7 @@
 		<title>Defold Router Demo 0.1</title>
 		<style>
 			.canvas-app-container {
-			  background: rgb(255,255,255) no-repeat center url("splash_image.png");
+			  background: rgb(255,255,255) no-repeat center url("try_game.png");
 			  /* A positioned parent for loading visuals */
 			  position: relative;
 			}
@@ -18,6 +18,11 @@
 			  /* Auto width and height in Safari/Chrome fullscreen. */
 			  width: auto;
 			  height: auto;
+			}
+
+			.canvas-app-canvas {
+				max-height: 100vh;
+				max-width: 100%;
 			}
 
 			.canvas-app-progress {
@@ -46,7 +51,7 @@
 			}
 		</style>
 
-
+		
 	</head>
 
 	<body>
@@ -59,7 +64,7 @@
 	<button id="fullscreen" class="button">Fullscreen</button>
 
 	<!-- -->
-
+	  
 	  <script type='text/javascript' src="dmloader.js"></script>
 	  <script type='text/javascript' src="Defold Router Demo.js" async onload=""></script>
 	<!-- -->
@@ -69,7 +74,7 @@
 			archive_location_filter: function( path ) {
 				return ("archive" + path + "");
 			},
-
+            
 			splash_image: "splash_image.png",
 			custom_heap_size: 268435456
 		}

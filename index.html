@@ -1,52 +1,59 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset='utf-8'>
-    <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <meta name="description" content="Defold Router : Routing solution for Defold Game Engine">
-    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
-    <title>Defold Router</title>
+	<meta charset='utf-8'>
+	<meta http-equiv="X-UA-Compatible" content="chrome=1">
+	<meta name="description" content="whDefRouter: A powerful screen manager for Defold Game Engine">
+	<link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+	<title>Defold Router</title>
 </head>
 <body>
-    <!-- HEADER -->
-    <div id="header_wrap" class="outer">
-        <header class="inner">
-            <a id="forkme_banner" href="https://github.com/Megus/defold-router">View on GitHub</a>
-            <h1 id="project_title">Defold Router</h1>
-            <h2 id="project_tagline">Routing solution for Defold Game Engine</h2>
-        </header>
-    </div>
+	<!-- HEADER -->
+	<div id="header_wrap" class="outer">
+		<header class="inner">
+			<a id="forkme_banner" href="https://github.com/Megus/defold-router">View on GitHub</a>
+			<h1 id="project_title">whDefRouter</h1>
+			<h2 id="project_tagline">A powerful screen manager for Defold Game Engine</h2>
+		</header>
+	</div>
 
-    <!-- MAIN CONTENT -->
-    <div id="main_content_wrap" class="outer">
-        <section id="main_content" class="inner">
-            <h3>Intro</h3>
-            <p>Just like a lot of <a href="http://defold.com">Defold</a> newbies, I've quickly found out that there are no standard functions to implement complex navigation between game screens in Defold. The provided examples only show the general idea of switching screens with collection proxies but your game usually has more than just two screens. So I came up with an idea to develop a reusable navigation solution. I took the inspiration from UINavigationContoller in iOS and React/Redux.</p>
+	<!-- MAIN CONTENT -->
+	<div id="main_content_wrap" class="outer">
+		<section id="main_content" class="inner">
+			<h3>Intro</h3>
 
-            <p>This router gives you several navigation methods:</p>
+			<p><a href="https://www.defold.com">Defold</a> doesn't provide standard functions to implement complex navigation between game screens. The provided examples only show the general idea of switching screens with collection proxies, but your game usually has more than just two screens. So I came up with a plan to develop a reusable navigation solution. I took the inspiration from UINavigationContoller in iOS and React/Redux. My library was the first of its kind, but now other solutions also exist, e.g. <a href="https://www.defold.com/community/projects/88415/">Monarch</a>.</p>
 
-            <ul>
-                <li>state machine approach to navigation (which, I believe, suits games perfectly);</li>
-                <li>navigation stack (with two variants of pushing the scene to the stack);</li>
-                <li>show popups.</li>
-            </ul>
+			<p>Features:</p>
 
-            <p>The demo project contains code samples for all possible Router use cases.</p>
+			<ul>
+				<li>Three different ways to navigate between screens:
+				<ul>
+					<li>State machine approach to navigation (which, I believe, suits games perfectly);</li>
+					<li>Navigation stack (with two variants of pushing the scene to the stack);</li>
+					<li>Popups.</li>
+				</ul>
+				<li>Synchronous or asynchronous loading of collections.</li>
+				<li>Support for animated screen transitions.</li>
+				<li>Support for "Loading..." screen.</li>
+			</ul>
+			
+			<p>The demo project provides code samples for all possible Router use cases.</p>
 
-            <p>Read the documentation on <a href="https://github.com/Megus/defold-router">GitHub project page</a>.</p>
+			<p>Read the documentation on <a href="https://github.com/Megus/defold-router">GitHub project page</a>.</p>
 
-            <h3>Router Demo Project</h3>
-            <p><a class="zip_download_link" href="https://github.com/Megus/defold-router/zipball/master">Download demo project source code</a>.</p>
-            <iframe src="demo/index.html" width="820" height="680"></iframe>
-        </section>
-    </div>
+			<h3>Router Demo Project</h3>
+			<p><a class="zip_download_link" href="https://github.com/Megus/defold-router/zipball/master">Download demo project source code</a>.</p>
+			<iframe src="demo/index.html" width="820" height="680"></iframe>
+		</section>
+	</div>
 
-    <!-- FOOTER  -->
-    <div id="footer_wrap" class="outer">
-        <footer class="inner">
-            <p class="copyright">Defold Router maintained by <a href="https://github.com/Megus">Roman "Megus" Petrov</a> / <a href="https://wisehedgehog.studio">Wise Hedgehog Studio</a>.</p>
-            <p>Published with <a href="https://pages.github.com">GitHub Pages</a></p>
-        </footer>
-    </div>
+	<!-- FOOTER  -->
+	<div id="footer_wrap" class="outer">
+		<footer class="inner">
+			<p class="copyright">Defold Router maintained by <a href="https://github.com/Megus">Roman "Megus" Petrov</a> / <a href="https://wisehedgehog.studio">Wise Hedgehog Studio</a>.</p>
+			<p>Published with <a href="https://pages.github.com">GitHub Pages</a></p>
+		</footer>
+	</div>
 </body>
 </html>
