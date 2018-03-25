@@ -81,7 +81,7 @@ end
 -- Get the next scene from the routing state machine
 local function get_next_scene(ro, current, output)
 	local route = current and ro.scenes.routing[current] or ro.scenes.first_scene
-	assert(route, current and "Can't get the scene next to [" .. current .. "]" or "First scene is not set")
+	assert(route, current and "Can't get the scene next to [" .. current .. "]" or "first_scene is not set")
 	if type(route) == "string" then
 		return route
 	elseif type(route) == "table" then
