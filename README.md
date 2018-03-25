@@ -2,11 +2,11 @@
 
 A powerful screen manager for games built with [Defold Game Engine](https://www.defold.com).
 
-Defold doesn't provide standard functions to implement complex navigation between game screens. The provided examples only show the general idea of switching screens with collection proxies, but your game usually has more than just two screens. So I came up with an idea to develop a reusable navigation solution. I took the inspiration from ```UINavigationContoller``` in iOS and React/Redux. My library was the first of its kind, but now other solutions also exist, e.g. [Monarch](https://www.defold.com/community/projects/88415/).
+Defold doesn't provide standard functions to implement complex navigation between game screens. The provided examples only show the general idea of switching screens with collection proxies, but your game usually has more than just two screens. So I came up with a plan to develop a reusable navigation solution. I took the inspiration from ```UINavigationContoller``` in iOS and React/Redux. My library was the first of its kind, but now other solutions also exist, e.g. [Monarch](https://www.defold.com/community/projects/88415/).
 
 **Features:**
 
-- 3 different ways to navigate between screens:
+- Three different ways to navigate between screens:
 	- State machine approach to navigation (which, I believe, suits games perfectly);
 	- Navigation stack (with two variants of pushing the scene to the stack);
 	- Popups.
@@ -30,16 +30,16 @@ The demo project provides code samples for all possible Router use cases.
 		- [Show a Popup](#show-a-popup)
 	- [Close scene](#close-scene)
 - [Setting up animated scene transitions](#setting-up-animated-scene-transitions)
-- [Setting up "Loading" screen](#settings-up-loading-screen)
+- [Setting up "Loading" screen](#setting-up-loading-screen)
 - [Handling Router messages in collection scripts](#handling-router-messages-in-collection-scripts)
 
 ## Setup
 
 Add the library zip URL as a [dependency](http://www.defold.com/manuals/libraries/#_setting_up_library_dependencies) to your Defold project: [https://github.com/Megus/defold-router/archive/master.zip](https://github.com/Megus/defold-router/archive/master.zip)
 
-Create a game object (I recommend to name it ```scenes```) in the main collection with [collection proxies](https://www.defold.com/manuals/collection-proxy/) for all your scenes (I'm using the word "scene" for a screen). Proxy names must match the names of your collections. Don't forget that collection filename is not the same as collection name, so check that ```name``` properties of your collections are properly set.
+Create a game object (I recommend to name it ```scenes```) in the main collection with [collection proxies](https://www.defold.com/manuals/collection-proxy/) for all your scenes (I'm using the word "scene" for a screen). Proxy names must match the names of your collections. Don't forget that collection filename is not the same as collection name, so check that ```name``` properties of your collections are appropriately set.
 
-Create the scenes description table Lua module (e.g. ```scenes.lua``` in the ```main``` folder) with the following sample content (details will be given below):
+Create the scenes description table Lua module (e.g., ```scenes.lua``` in the ```main``` folder) with the following sample content (see details below):
 
 ```lua
 local M = {
@@ -79,23 +79,23 @@ router.new(scenes, router_url, scene_controller_path, loader_url)
 
 - The scene description table.
 - URL string to the script of the game object with the proxies.
-- Path to the controller script of your scenes. You should use the same name for all scenes (```controller#script``` is a good choice).
+- The path to the controller script of your scenes. You should use the same name for all scenes (```controller#script``` is a good choice).
 - Optional: URL of a "Loading..." component (only if you use it).
 
-Now you can try to run your project and see that your first scene is loaded!
+Now you can try to run your project and see that the Router loaded your first scene!
 
 ---
 
 ## Setting up the navigation
 
-The Router treats each scene as a function which has some input parameters and returns some output. This approach is used to decouple scenes. Scenes also may have an internal state which is persisted between scene launches. The Router will store these states.
+The Router treats each scene as a function which has some input parameters and returns some output. This approach is used to decouple scenes. Scenes also may have an internal state which the Router can persist between scene launches.
 
 There are four ways to change scenes:
 
-- Scene switching according to rules defined by a routing table (state machine approach).
-- Pushing a new scene to the stack with unloading the current scene.
-- Pushing a new scene to the stack with keeping the current scene loaded, but disabled.
-- Showing a popup scene with keeping the current scene.
+- Switch scenes according to rules defined by a routing table (state machine approach).
+- Push a new scene to the stack with unloading the current one.
+- Push a new scene to the stack, and keep the current one loaded, but disabled.
+- Show a pop-up scene and keep the current one loaded and enabled.
 
 ### Scenes description table
 
@@ -107,7 +107,7 @@ The Scenes description table has three fields:
 
 #### ```info```
 
-Each scene has three properties. You don't need to define all of them, if any property is missing, the Router will use a default value. You can even skip a scene in the info table, the Router will use default values for all properties in this case.
+Each scene has three properties. You don't need to define all of them if any property is missing, the Router will use a default value. You can even skip a scene in the info table; the Router will use default values for all properties in this case.
 
 Example:
 
@@ -127,7 +127,7 @@ This field defines the first scene of your game. It can be a string, a table or 
 
 - string — simply the name of the first scene
 - table — you can pass some input to the first scene. Example: ```{"main_menu", {skip_tutorial = true}}```
-- function — if you need to implement some logic to define the first scene (e.g. different scenes for iOS and Android), use this option. The function should return two values: scene name and scene input table (input table is optional)
+- function — if you need to implement some logic to define the first scene (e.g., different scenes for iOS and Android), use this option. The function should return two values: scene name and scene input table (input table is optional)
 
 ### State Machine approach
 
@@ -156,7 +156,7 @@ routing = {
 
 ### Using the navigation stack
 
-You can use a traditional stack based navigation approach with the Router. You can also combine state machine approach with the stack navigation, which is very convenient.
+You can use a traditional stack-based navigation approach with the Router. You can also combine state machine approach with the stack navigation, which is very convenient.
 
 #### Push a scene
 
@@ -164,7 +164,7 @@ You can use a traditional stack based navigation approach with the Router. You c
 router.push(router_id, scene_name, input)
 ```
 
-Pushes the new scene to the stack and passes the input to it. The current scene will be unloaded to save memory but you can pass its state so Router can save it. When the pushed scene is closed, the current scene will be loaded again and receive the output of the pushed scene.
+Pushes the new scene to the stack and passes the input to it. The current scene will be unloaded to save memory, but you can pass its state so Router can save it. When the pushed scene is closed, the current scene will be loaded again and receive the output of the pushed scene.
 
 Parameters ```input``` and ```state``` are optional.
 
@@ -184,7 +184,7 @@ Parameter ```input``` is optional.
 router.popup(router_id, scene_name, input)
 ```
 
-Pushed the new scene to the stack and passes the input to it. The current scene is kept in memory but the input focus will be revoked. When the popup scene is closed, the current scene will get input focus back and receive the output of the popup scene.
+Pushes the new scene to the stack and passes the input to it. The current scene is kept in memory, but the input focus will be revoked. When the popup scene is closed, the current scene will get input focus back and receive the output of the pop-up scene.
 
 ### Close scene
 
@@ -208,14 +208,14 @@ if message_id == router.messages.transition then
 end
 ```
 
-There are 4 transition types, they're defined as constants in ```router.transition_types``` table:
+There are four transition types; they're defined as constants in ```router.transition_types``` table:
 
 - ```t_in``` — Show scene
 - ```t_out``` — Hide scene
 - ```t_back_in``` — Show scene after returning from a pushed scene
 - ```t_back_out``` — Hide pushed scene
 
-When the animation is finished, you must call: ```router.finished_transition(router_id)``` function to let the Router continue its job.
+When the animation is finished, you must call ```router.finished_transition(router_id)``` function to let the Router continue its job.
 
 The demo project has an example of fade in/fade out effect as the screen transition.
 
