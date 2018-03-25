@@ -5,11 +5,11 @@
 
 local router = require("wh_router.router")
 
-function init(self)
+function init(_)
     msg.post(".", "acquire_input_focus")
 end
 
-function on_message(self, message_id, message, sender)
+function on_message(self, message_id, message, _)
     if message_id == router.messages.scene_input then
         self.router = message.router
         self.world = message.input.world
@@ -17,6 +17,18 @@ function on_message(self, message_id, message, sender)
         msg.post("gui", "show_level_number", {world = self.world, level = self.level})
     elseif message_id == router.messages.scene_popped then
         msg.post("gui", "enable")
+    elseif message_id == router.messages.transition then
+        if message.t_type == router.transition_types.t_in or message.t_type == router.transition_types.t_back_in then
+            msg.post("gui", "fade_in")
+        else
+            print("fadeout")
+            msg.post("gui", "fade_out")
+        end
+    elseif message_id == hash("fade_done") then
+        router.finished_transition(self.router)
+        if message.out then
+            msg.post("gui", "disable")
+        end
     elseif message_id == hash("settings") then
         msg.post("gui", "disable")
         router.popup(self.router, "settings")
@@ -25,7 +37,6 @@ function on_message(self, message_id, message, sender)
     elseif message_id == hash("fail") then
         router.close(self.router, {win = false, world = self.world, level = self.level})
     elseif message_id == hash("help") then
-        msg.post("gui", "disable")
         router.push_modal(self.router, "help")
     end
 end

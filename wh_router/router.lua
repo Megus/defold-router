@@ -10,7 +10,16 @@ local M = {}
 --- Router message hashes
 M.messages = {
 	scene_input = hash("wh_router_scene_input"),      -- scene input message
-	scene_popped = hash("wh_router_scene_popped")     -- scene popped message
+	scene_popped = hash("wh_router_scene_popped"),    -- scene popped message
+	transition = hash("wh_router_transition"),
+}
+
+M.transition_types = {
+	t_none = 0,
+	t_in = 1,
+	t_out = 2,
+	t_back_in = 3,
+	t_back_out = 4
 }
 
 ----------------------------------------------------------------------------------------------------
@@ -22,18 +31,18 @@ local messages = {
 	push = hash("wh_router_scene_push"),
 	push_modal = hash("wh_router_scene_push_modal"),
 	popup = hash("wh_router_scene_popup"),
-	close = hash("wh_router_scene_close")
+	close = hash("wh_router_scene_close"),
+	finished_transition = hash("wh_router_finished_transition")
 }
 
 local msg_proxy_loaded = hash("proxy_loaded")
 
 -- Scene display methods
 local methods = {
-	switch = 0,
-	push = 1,
-	push_modal = 2,
-	popup = 3,
-	restore = 4
+	switch = 1,
+	push = 2,
+	push_modal = 3,
+	popup = 4,
 }
 
 -- Private storage: routing tables and router objects
@@ -61,10 +70,12 @@ local function scene_info(ro, scene_name)
 	return info
 end
 
+-- Returns top scene at the stack
 local function top_scene(ro)
 	return #ro.stack ~= 0 and ro.stack[#ro.stack] or nil
 end
 
+-- Get the next scene from the routing state machine
 local function get_next_scene(ro, current, output)
 	local route = current and ro.scenes.routing[current] or ro.scenes.first_scene
 	assert(route, current and "Can't get the scene next to [" .. current .. "]" or "First scene is not set")
@@ -87,24 +98,28 @@ local function unload_scene(scene)
 	msg.post(url, "unload")
 end
 
-local function init_scene(ro, scene, message, did_pop)
-	message.router = ro.router_url
-	message.state = ro.states[scene.name]
-
-	msg.post(scene_controller_url(ro, scene.name),
-		did_pop and M.messages.scene_popped or M.messages.scene_input,
-		message)
-
-	-- Start "in" transition of the new scene
-
-	-- Wait for transition to stop (do we need this?)
-	-- ro.wait_for = ...
-	-- coroutine.yield()
+local function scene_transition(ro, scene, t_type)
+	if t_type == M.transition_types.t_none then return end
+	print("Transition " .. scene.name .. " " .. t_type)
+	local info = scene_info(ro, scene.name)
+	if info.has_transitions then
+		msg.post(scene_controller_url(ro, scene.name), M.messages.transition, {t_type = t_type})
+		ro.wait_for = messages.finished_transition
+		coroutine.yield()
+	end
+	print("Transition done")
 end
 
+-- Initialize scene
+local function init_scene(ro, scene, message, did_pop, t_type)
+	message.router = ro.router_url
+	message.state = ro.states[scene.name]
+	msg.post(scene_controller_url(ro, scene.name), did_pop and M.messages.scene_popped or M.messages.scene_input, message)
+	scene_transition(ro, scene, t_type)
+end
+
+-- Load new scene
 local function load_scene(ro, scene, previous, message, did_pop)
-	if did_pop == nil then did_pop = false end
-	-- Insert new scene to stack and start to load it
 	table.insert(ro.stack, scene)
 	local info = scene_info(ro, scene.name)
 	msg.post("#" .. scene.name, info.sync_load and "load" or "async_load")
@@ -123,7 +138,7 @@ local function load_scene(ro, scene, previous, message, did_pop)
 	-- Disable loading indicator, if needed
 
 	msg.post("#" .. scene.name, "enable")
-	init_scene(ro, scene, message, did_pop)
+	init_scene(ro, scene, message, did_pop, did_pop and M.transition_types.t_back_in or M.transition_types.t_in)
 end
 
 local function switch_scene(ro, current_output)
@@ -131,15 +146,16 @@ local function switch_scene(ro, current_output)
 	if current then table.remove(ro.stack, #ro.stack) end
 	local next_name, input = get_next_scene(ro, current and current.name or nil, current_output)
 	local scene = {name = next_name, method = methods.switch}
-	load_scene(ro, scene, current, {input = input})
+	load_scene(ro, scene, current, {input = input}, false)
 end
 
 local function push_scene(ro, scene_name, input, state)
 	local co = coroutine.create(function()
 		local current = top_scene(ro)
 		ro.states[scene_name] = state
+		scene_transition(ro, current, M.transition_types.t_out)
 		local scene = {name = scene_name, method = methods.push}
-		load_scene(ro, scene, current, {input = input})
+		load_scene(ro, scene, current, {input = input}, false)
 		ro.co = nil
 	end)
 	ro.co = co
@@ -149,9 +165,12 @@ end
 local function push_modal_scene(ro, scene_name, input)
 	local co = coroutine.create(function()
 		local current = top_scene(ro)
+		print("hi1")
+		scene_transition(ro, current, M.transition_types.t_out)
+		print("hi2")
 		msg.post("#" .. current.name, "disable")
 		local scene = {name = scene_name, method = methods.push_modal}
-		load_scene(ro, scene, nil, {input = input})
+		load_scene(ro, scene, nil, {input = input}, false)
 		ro.co = nil
 	end)
 	ro.co = co
@@ -163,7 +182,7 @@ local function popup_scene(ro, scene_name, input)
 		local current = top_scene(ro)
 		local scene = {name = scene_name, method = methods.popup}
 		msg.post(scene_controller_url(ro, current.name), "release_input_focus")
-		load_scene(ro, scene, nil, {input = input})
+		load_scene(ro, scene, nil, {input = input}, false)
 		ro.co = nil
 	end)
 	ro.co = co
@@ -175,9 +194,8 @@ local function close_scene(ro, output, state)
 		-- Save state
 		local scene = top_scene(ro)
 		ro.states[scene.name] = state
-		-- Start "out" transition of the current scene
-
-		-- Wait for transition to end
+		scene_transition(ro, scene,
+			scene.method == methods.switch and M.transition_types.t_out or M.transition_types.t_back_out)
 
 		-- Now load next scene
 		if scene.method == methods.switch then
@@ -192,12 +210,12 @@ local function close_scene(ro, output, state)
 			unload_scene(scene)
 			local previous = top_scene(ro)
 			msg.post("#" .. previous.name, "enable")
-			init_scene(ro, previous, {output = output}, true)
+			init_scene(ro, previous, {output = output}, true, M.transition_types.t_back_in)
 		elseif scene.method == methods.popup then
 			table.remove(ro.stack, #ro.stack)
 			unload_scene(scene)
 			local previous = top_scene(ro)
-			init_scene(ro, previous, {output = output}, true)
+			init_scene(ro, previous, {output = output}, true, M.transition_types.t_none)
 			msg.post(scene_controller_url(ro, previous.name), "acquire_input_focus")
 		end
 		ro.co = nil
@@ -316,6 +334,12 @@ function M.close(router_id, output, state)
 	local ro = router_objects[router_id]
 	assert(ro, "Invalid router_id")
 	msg.post(ro.router_url, messages.close, {output = output, state = state})
+end
+
+function M.finished_transition(router_id)
+	local ro = router_objects[router_id]
+	assert(ro, "Invalid router_id")
+	msg.post(ro.router_url, messages.finished_transition)
 end
 
 return M

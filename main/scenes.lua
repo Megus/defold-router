@@ -10,6 +10,7 @@ local M = {
         -- Regular scenes
         main_menu = {
             sync_load = true,
+            has_transitions = true,
         },
         level_selector = {
             has_transitions = true,
@@ -26,10 +27,8 @@ local M = {
         help = {
         },
         help_chapter = {
-
         },
         settings = {
-
         }
     },
 

@@ -5,7 +5,7 @@
 
 local router = require("wh_router.router")
 
-function init(self)
+function init(_)
     msg.post(".", "acquire_input_focus")
 end
 
@@ -17,7 +17,7 @@ local function set_state(self, state)
     end
 end
 
-function on_message(self, message_id, message, sender)
+function on_message(self, message_id, message, _)
     if message_id == router.messages.scene_input then
         self.router = message.router
         set_state(self, message.state)
@@ -32,6 +32,14 @@ function on_message(self, message_id, message, sender)
         msg.post("gui", "set_info", {text = "Wins: " .. self.state.wins .. ", Fails: " .. self.state.fails})
     elseif message_id == router.messages.scene_popped then
         msg.post("gui", "enable")
+    elseif message_id == router.messages.transition then
+        if message.t_type == router.transition_types.t_in or message.t_type == router.transition_types.t_back_in then
+            msg.post("gui", "fade_in")
+        else
+            msg.post("gui", "fade_out")
+        end
+    elseif message_id == hash("fade_done") then
+        router.finished_transition(self.router)
     elseif message_id == hash("close") then
         router.close(self.router, nil, self.state)
     elseif message_id == hash("settings") then
