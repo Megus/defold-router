@@ -108,7 +108,7 @@ local function scene_transition(ro, scene, t_type)
 	if t_type == M.transition_types.t_none then return end
 	local info = scene_info(ro, scene.name)
 	if info.has_transitions then
-		msg.post(scene_controller_url(ro, scene.name), M.messages.transition, {t_type = t_type})
+		msg.post(scene_controller_url(ro, scene.name), M.messages.transition, {router = ro.router_url, t_type = t_type})
 		ro.wait_for = messages.finished_transition
 		coroutine.yield()
 	end
