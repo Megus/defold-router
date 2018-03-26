@@ -7,9 +7,9 @@ Defold doesn't provide standard functions to implement complex navigation betwee
 **Features:**
 
 - Three different ways to navigate between screens:
-	- State machine approach to navigation (which, I believe, suits games perfectly);
-	- Navigation stack (with two variants of pushing the scene to the stack);
-	- Popups.
+    - State machine approach to navigation (which, I believe, suits games perfectly);
+    - Navigation stack (with two variants of pushing the scene to the stack);
+    - Popups.
 - Synchronous or asynchronous loading of collections.
 - Support for animated screen transitions.
 - Support for "Loading..." screen.
@@ -22,13 +22,13 @@ The demo project provides code samples for all possible Router use cases.
 
 - [Setup](#setup)
 - [Setting up the navigation](#setting-up-the-navigation)
-	- [Scenes description table](#scenes-description-table)
-	- [State Machine approach](#state-machine-approach)
-	- [Using the navigation stack](#using-the-navigation-stack)
-		- [Push a scene](#push-a-scene)
-		- [Push a modal scene](#push-a-modal-scene)
-		- [Show a Popup](#show-a-popup)
-	- [Close scene](#close-scene)
+    - [Scenes description table](#scenes-description-table)
+    - [State Machine approach](#state-machine-approach)
+    - [Using the navigation stack](#using-the-navigation-stack)
+        - [Push a scene](#push-a-scene)
+        - [Push a modal scene](#push-a-modal-scene)
+        - [Show a Popup](#show-a-popup)
+    - [Close scene](#close-scene)
 - [Setting up animated scene transitions](#setting-up-animated-scene-transitions)
 - [Setting up "Loading" screen](#setting-up-loading-screen)
 - [Handling Router messages in collection scripts](#handling-router-messages-in-collection-scripts)
@@ -43,9 +43,9 @@ Create the scenes description table Lua module (e.g., ```scenes.lua``` in the ``
 
 ```lua
 local M = {
-	info = {},
-	first_scene = "main_menu", -- Change to the name of your first scene
-	routing = {}
+    info = {},
+    first_scene = "main_menu", -- Change to the name of your first scene
+    routing = {}
 }
 
 return M
@@ -58,16 +58,16 @@ local router = require("wh_router.router") -- Require Router library
 local scenes = require("main.scenes") -- Path to your scene description table
 
 function init(self)
-	msg.post(".", "acquire_input_focus")
-	-- Create the router object with the main scene description table.
-	-- The first scene will be loaded automatically.
-	self.rid = router.new(scenes, "main:/scenes#router", "controller#script")
+    msg.post(".", "acquire_input_focus")
+    -- Create the router object with the main scene description table.
+    -- The first scene will be loaded automatically.
+    self.rid = router.new(scenes, "main:/scenes#router", "controller#script")
 end
 
 function on_message(self, message_id, message, sender)
-	-- Handle router messages
-	router.on_message(self.rid, message_id, message, sender)
-	-- Handle other messages here
+    -- Handle router messages
+    router.on_message(self.rid, message_id, message, sender)
+    -- Handle other messages here
 end
 ```
 
@@ -113,11 +113,11 @@ Example:
 
 ```lua
 info = {
-	main_menu = {
-		sync_load = true,			-- Load this scene synchronously? Default: false
-		has_transitions = false,	-- Does this scene have in/out transition animations? Default: false
-		show_loading = false		-- Show "Loading..." when loading? Default: false
-	},
+    main_menu = {
+        sync_load = true,           -- Load this scene synchronously? Default: false
+        has_transitions = false,    -- Does this scene have in/out transition animations? Default: false
+        show_loading = false        -- Show "Loading..." when loading? Default: false
+    },
 }
 ```
 
@@ -137,20 +137,20 @@ An example of a routing table:
 
 ```lua
 routing = {
-	-- Go to Level Selector from the Main Menu screen
-	main_menu = "level_selector",
+    -- Go to Level Selector from the Main Menu screen
+    main_menu = "level_selector",
 
-	gameplay = function (output)
-		if output.win then
-			return "win", {world = output.world, level = output.level}
-		else
-			return "fail", {world = output.world, level = output.level}
-		end
-	end,
+    gameplay = function (output)
+        if output.win then
+            return "win", {world = output.world, level = output.level}
+        else
+            return "fail", {world = output.world, level = output.level}
+        end
+    end,
 
-	-- Go to Level Selector and pass some input to this scene
-	fail = {"level_selector", {win = false}},
-	win = {"level_selector", {win = true}}	
+    -- Go to Level Selector and pass some input to this scene
+    fail = {"level_selector", {win = false}},
+    win = {"level_selector", {win = true}}  
 }
 ```
 
@@ -204,7 +204,7 @@ Example part of ```on_message``` function:
 
 ```lua
 if message_id == router.messages.transition then
-	-- Do some animations according to transition type in message.t_type
+    -- Do some animations according to transition type in message.t_type
 end
 ```
 
@@ -223,7 +223,7 @@ The demo project has an example of fade in/fade out effect as the screen transit
 
 ## Setting up "Loading" screen
 
-Some collections may take a lot of time to load. It's good to show a user some "Loading..." message in this case. To do it, create a game object in your main collection and pass its full URL as a 4th parameter to ```router.new``` function. An example:
+Some collections may take a lot of time to load. It's good to show a user some "Loading..." message in this case. To do it, create a game object in your main collection and pass its full URL as the 4th parameter to ```router.new``` function. An example:
 
 ```lua
 self.router_id = router.new(scenes, "main:/scenes#router", "controller#script", "main:/loader")
@@ -235,14 +235,14 @@ An example ```on_message``` function of "Loading..." GO:
 
 ```lua
 function on_message(_, message_id, message, _)
-	if message_id == router.messages.loader_start then
-		gui.set_color(gui.get_node("loading"), vmath.vector4(1, 1, 1, 1))
-	elseif message_id == router.messages.loader_stop then
-		gui.set_color(gui.get_node("loading"), vmath.vector4(1, 1, 1, 1))
+    if message_id == router.messages.loader_start then
+        gui.set_color(gui.get_node("loading"), vmath.vector4(1, 1, 1, 1))
+    elseif message_id == router.messages.loader_stop then
+        gui.set_color(gui.get_node("loading"), vmath.vector4(1, 1, 1, 1))
         gui.animate(gui.get_node("loading"), "color.w", 0, gui.EASING_LINEAR, 0.3, 0, function()
-			router.stopped_loader(message.router)
+            router.stopped_loader(message.router)
         end)
-	end
+    end
 end
 ```
 
@@ -250,9 +250,13 @@ end
 
 ## Handling Router messages in collection scripts
 
-You need to handle two Router messages in your scene controller scripts: ```router.messages.scene_input``` and ```router.messages.scene_popped```. Handling the first one is mandatory, the second one should be handled only if you use ```push```, ```push_modal``` or ```popup``` Router functions in this scene.
+You need to handle some Router messages in your scene controller scripts:
 
-Please note that ```router.messages.scene_input``` message is not sent when you return to the scene after ```push``` function, only ```router.messages.scene_popped``` is sent.
+- ```router.messages.scene_input``` — mandatory.
+- ```router.messages.scene_popped``` — handle if you use ```push```, ```push_modal``` or ```popup``` Router functions in this scene.
+- ```router.messages.transition``` — handle if you use animated scene transitions.
+
+Please note that the ```router.messages.scene_input``` message is not sent when you return to the scene after ```push``` function, only ```router.messages.scene_popped``` is sent.
 
 ```lua
 -- Load router library
@@ -260,24 +264,24 @@ local router = require("wh_router.router")
 
 -- Example of on_message function
 function on_message(self, message_id, message, sender)
-	if message_id == router.messages.scene_input then
-		-- Router object is passed in the message, save it to use later
-		self.rid = message.router
-		-- Setup the scene according to the state in message.state
-		-- Handle scene input contained in message.input
-	elseif message_id == router.messages.scene_popped then
-		self.rid = message.router
-		-- If you push scenes (push/push_modal/popup) in the scene,
-		-- handle this message and pushed scene output in message.output
-	elseif message_id == router.messages.transition then
-		-- Handle animated scene transitions
-		if message.t_type == router.transition_types.t_in then
-			-- Handle "in" transition
-		end
-	elseif message_id == hash("select_level") then
-		-- Example of using router close function with sending the output and the scene state to persist
-		router.close(self.rid, {world = self.state.world, level = message.level}, self.state)
-	end
+    if message_id == router.messages.scene_input then
+        -- Router object is passed in the message, save it to use later
+        self.rid = message.router
+        -- Setup the scene according to the state in message.state
+        -- Handle scene input contained in message.input
+    elseif message_id == router.messages.scene_popped then
+        self.rid = message.router
+        -- If you push scenes (push/push_modal/popup) in the scene,
+        -- handle this message and pushed scene output in message.output
+    elseif message_id == router.messages.transition then
+        -- Handle animated scene transitions
+        if message.t_type == router.transition_types.t_in then
+            -- Handle "in" transition
+        end
+    elseif message_id == hash("select_level") then
+        -- Example of using router close function with sending the output and the scene state to persist
+        router.close(self.rid, {world = self.state.world, level = message.level}, self.state)
+    end
 end
 ```
 
