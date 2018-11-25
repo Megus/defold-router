@@ -39,7 +39,7 @@ nodes {
   type: TYPE_BOX
   blend_mode: BLEND_MODE_ALPHA
   texture: ""
-  id: "dim"
+  id: "shadow"
   xanchor: XANCHOR_NONE
   yanchor: YANCHOR_NONE
   pivot: PIVOT_CENTER
@@ -55,7 +55,61 @@ nodes {
   clipping_mode: CLIPPING_MODE_NONE
   clipping_visible: true
   clipping_inverted: false
-  alpha: 0.5
+  alpha: 0.0
+  template_node_child: false
+  size_mode: SIZE_MODE_MANUAL
+}
+nodes {
+  position {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 1.0
+  }
+  rotation {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 1.0
+  }
+  scale {
+    x: 1.0
+    y: 1.0
+    z: 1.0
+    w: 1.0
+  }
+  size {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 1.0
+  }
+  color {
+    x: 1.0
+    y: 1.0
+    z: 1.0
+    w: 1.0
+  }
+  type: TYPE_BOX
+  blend_mode: BLEND_MODE_ALPHA
+  texture: ""
+  id: "container"
+  xanchor: XANCHOR_NONE
+  yanchor: YANCHOR_NONE
+  pivot: PIVOT_CENTER
+  adjust_mode: ADJUST_MODE_FIT
+  layer: ""
+  inherit_alpha: true
+  slice9 {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 0.0
+  }
+  clipping_mode: CLIPPING_MODE_NONE
+  clipping_visible: true
+  clipping_inverted: false
+  alpha: 1.0
   template_node_child: false
   size_mode: SIZE_MODE_MANUAL
 }
@@ -92,6 +146,7 @@ nodes {
   }
   type: TYPE_TEMPLATE
   id: "info"
+  parent: "container"
   layer: ""
   inherit_alpha: true
   alpha: 1.0
@@ -253,10 +308,11 @@ nodes {
   }
   type: TYPE_TEMPLATE
   id: "close"
+  parent: "container"
   layer: ""
   inherit_alpha: true
   alpha: 1.0
-  template: "/common/label.gui"
+  template: "/common/button.gui"
   template_node_child: false
 }
 nodes {
@@ -292,7 +348,7 @@ nodes {
   }
   type: TYPE_BOX
   blend_mode: BLEND_MODE_ALPHA
-  texture: "objects/button"
+  texture: "buttons/button"
   id: "close/box"
   xanchor: XANCHOR_NONE
   yanchor: YANCHOR_NONE
@@ -302,17 +358,72 @@ nodes {
   layer: ""
   inherit_alpha: true
   slice9 {
-    x: 8.0
-    y: 8.0
-    z: 8.0
-    w: 8.0
+    x: 20.0
+    y: 20.0
+    z: 40.0
+    w: 40.0
   }
   clipping_mode: CLIPPING_MODE_NONE
   clipping_visible: true
   clipping_inverted: false
   alpha: 1.0
   overridden_fields: 4
-  overridden_fields: 9
+  template_node_child: true
+  size_mode: SIZE_MODE_MANUAL
+}
+nodes {
+  position {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 1.0
+  }
+  rotation {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 1.0
+  }
+  scale {
+    x: 1.0
+    y: 1.0
+    z: 1.0
+    w: 1.0
+  }
+  size {
+    x: 200.0
+    y: 60.0
+    z: 0.0
+    w: 1.0
+  }
+  color {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 1.0
+  }
+  type: TYPE_BOX
+  blend_mode: BLEND_MODE_ALPHA
+  texture: "buttons/button"
+  id: "close/pressed"
+  xanchor: XANCHOR_NONE
+  yanchor: YANCHOR_NONE
+  pivot: PIVOT_CENTER
+  adjust_mode: ADJUST_MODE_FIT
+  parent: "close/box"
+  layer: ""
+  inherit_alpha: true
+  slice9 {
+    x: 20.0
+    y: 20.0
+    z: 40.0
+    w: 40.0
+  }
+  clipping_mode: CLIPPING_MODE_NONE
+  clipping_visible: true
+  clipping_inverted: false
+  alpha: 0.0
+  overridden_fields: 4
   template_node_child: true
   size_mode: SIZE_MODE_MANUAL
 }
@@ -350,7 +461,7 @@ nodes {
   type: TYPE_TEXT
   blend_mode: BLEND_MODE_ALPHA
   text: "Close"
-  font: "menu"
+  font: "font"
   id: "close/text"
   xanchor: XANCHOR_NONE
   yanchor: YANCHOR_NONE
@@ -369,7 +480,7 @@ nodes {
   }
   adjust_mode: ADJUST_MODE_FIT
   line_break: false
-  parent: "close/box"
+  parent: "close"
   layer: ""
   inherit_alpha: true
   alpha: 1.0
@@ -377,7 +488,6 @@ nodes {
   shadow_alpha: 1.0
   overridden_fields: 4
   overridden_fields: 8
-  overridden_fields: 18
   template_node_child: true
   text_leading: 1.0
   text_tracking: 0.0

@@ -1,54 +1,8 @@
 -- Defold Router Demo Project
 --
--- © 2016 Roman "Megus" Petrov, Wise Hedgehog Studio.
+-- © 2016-2018 Roman "Megus" Petrov, Wise Hedgehog Studio.
 -- https://wisehedgehog.studio, https://megus.org
 
-local router = require("wh_router.router")
-
-function init(_)
-    msg.post(".", "acquire_input_focus")
-end
-
-local function set_state(self, state)
-    if state then
-        self.state = state
-    else
-        self.state = {world = 1, wins = 0, fails = 0}
-    end
-end
-
-function on_message(self, message_id, message, _)
-    if message_id == router.messages.scene_input then
-        self.router = message.router
-        set_state(self, message.state)
-        if message.input and message.input.win ~= nil then
-            if message.input.win then
-                self.state.wins = self.state.wins + 1
-            else
-                self.state.fails = self.state.fails + 1
-            end
-        end
-        msg.post("gui", "highlight_world", {world = self.state.world})
-        msg.post("gui", "set_info", {text = "Wins: " .. self.state.wins .. ", Fails: " .. self.state.fails})
-    elseif message_id == router.messages.scene_popped then
-        msg.post("gui", "enable")
-    elseif message_id == router.messages.transition then
-        if message.t_type == router.transition_types.t_in or message.t_type == router.transition_types.t_back_in then
-            msg.post("gui", "fade_in")
-        else
-            msg.post("gui", "fade_out")
-        end
-    elseif message_id == hash("fade_done") then
-        router.finished_transition(self.router)
-    elseif message_id == hash("close") then
-        router.close(self.router, nil, self.state)
-    elseif message_id == hash("settings") then
-        msg.post("gui", "disable")
-        router.popup(self.router, "settings")
-    elseif message_id == hash("select_world") then
-        self.state.world = message.world
-        msg.post("gui", "highlight_world", {world = self.state.world})
-    elseif message_id == hash("select_level") then
-        router.close(self.router, {world = self.state.world, level = message.level}, self.state)
-    end
+function on_message(_, message_id, message, _)
+    msg.post("gui", message_id, message)
 end

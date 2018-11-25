@@ -2,13 +2,13 @@
 
 A powerful screen manager for games built with [Defold Game Engine](https://www.defold.com).
 
-Defold doesn't provide standard functions to implement complex navigation between game screens. The provided examples only show the general idea of switching screens with collection proxies, but your game usually has more than just two screens. So I came up with a plan to develop a reusable navigation solution. I took the inspiration from ```UINavigationContoller``` in iOS and React/Redux. My library was the first of its kind, but now other solutions also exist, e.g. [Monarch](https://www.defold.com/community/projects/88415/).
+Defold doesn't provide standard functions to implement complex navigation between game screens. The provided examples only show the general idea of switching screens with collection proxies, but a game usually has more than just two screens. So I developed a reusable navigation solution. I took the inspiration from ```UINavigationContoller``` in iOS and React/Redux. My library was the first of its kind, but now other solutions also exist, e.g. [Monarch](https://www.defold.com/community/projects/88415/).
 
 **Features:**
 
 - Three different ways to navigate between screens:
-    - State machine approach to navigation (which, I believe, suits games perfectly);
-    - Navigation stack (with two variants of pushing the scene to the stack);
+    - State machine approach to navigation (which, I believe, suits games perfectly).
+    - Navigation stack (with two variants of pushing the scene to the stack).
     - Popups.
 - Synchronous or asynchronous loading of collections.
 - Support for animated screen transitions.
@@ -84,6 +84,8 @@ router.new(scenes, router_url, scene_controller_path, loader_url)
 
 Now you can try to run your project and see that the Router loaded your first scene!
 
+It is allowed to create and use multiple router instances if you have very complex navigation.
+
 ---
 
 ## Setting up the navigation
@@ -131,7 +133,7 @@ This field defines the first scene of your game. It can be a string, a table or 
 
 ### State Machine approach
 
-```routing``` field of the scenes description table defines the rules of switching between scenes. It works as a state machine where states are your scene names. When you close a scene that was displayed using routing table, Router will check the ```routing``` table field with the same name as your closing scene. These fields, just like, the ```first_scene``` field of the Scene description table can be a string, a table or a function.
+```routing``` field of the scenes description table defines the rules of switching between scenes. It works as a state machine where states are your scene names. When you close a scene that was displayed using routing table, Router will check the ```routing``` table field with the same name as your closing scene. These fields, just like, the ```first_scene``` field of the Scene description table can be a string, a table or a function. It is strongly recommended to use pure functions in this table to make your routing testable.
 
 An example of a routing table:
 

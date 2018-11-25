@@ -1,41 +1,8 @@
 -- Defold Router Demo Project
 --
--- © 2016 Roman "Megus" Petrov, Wise Hedgehog Studio.
+-- © 2016-2018 Roman "Megus" Petrov, Wise Hedgehog Studio.
 -- https://wisehedgehog.studio, https://megus.org
 
-local router = require("wh_router.router")
-
-function init(_)
-    msg.post(".", "acquire_input_focus")
-end
-
-function on_message(self, message_id, message, _)
-    if message_id == router.messages.scene_input then
-        self.router = message.router
-        self.world = message.input.world
-        self.level = message.input.level
-        msg.post("gui", "show_level_number", {world = self.world, level = self.level})
-    elseif message_id == router.messages.scene_popped then
-        msg.post("gui", "enable")
-    elseif message_id == router.messages.transition then
-        if message.t_type == router.transition_types.t_in or message.t_type == router.transition_types.t_back_in then
-            msg.post("gui", "fade_in")
-        else
-            msg.post("gui", "fade_out")
-        end
-    elseif message_id == hash("fade_done") then
-        router.finished_transition(self.router)
-        if message.out then
-            msg.post("gui", "disable")
-        end
-    elseif message_id == hash("settings") then
-        msg.post("gui", "disable")
-        router.popup(self.router, "settings")
-    elseif message_id == hash("win") then
-        router.close(self.router, {win = true, world = self.world, level = self.level})
-    elseif message_id == hash("fail") then
-        router.close(self.router, {win = false, world = self.world, level = self.level})
-    elseif message_id == hash("help") then
-        router.push_modal(self.router, "help")
-    end
+function on_message(_, message_id, message, _)
+    msg.post("gui", message_id, message)
 end

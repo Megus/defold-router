@@ -1,22 +1,8 @@
 -- Defold Router Demo Project
 --
--- © 2016 Roman "Megus" Petrov, Wise Hedgehog Studio.
+-- © 2016-2018 Roman "Megus" Petrov, Wise Hedgehog Studio.
 -- https://wisehedgehog.studio, https://megus.org
 
-local router = require("wh_router.router")
-
-function init(self)
-    msg.post(".", "acquire_input_focus")
-end
-
-function on_message(self, message_id, message, sender)
-    if message_id == router.messages.scene_input then
-        self.router = message.router
-    elseif message_id == router.messages.scene_popped then
-        self.router = message.router
-    elseif message_id == hash("back") then
-        router.close(self.router)
-    elseif message_id == hash("chapter") then
-        router.push(self.router, "help_chapter", {chapter = message.chapter})
-    end
+function on_message(_, message_id, message, _)
+    msg.post("gui", message_id, message)
 end

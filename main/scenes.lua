@@ -2,7 +2,7 @@
 --
 -- This table works like a simple state machine.
 --
--- © 2016 Roman "Megus" Petrov, Wise Hedgehog Studio.
+-- © 2016-2018 Roman "Megus" Petrov, Wise Hedgehog Studio.
 -- https://wisehedgehog.studio, https://megus.org
 
 local M = {
@@ -21,19 +21,20 @@ local M = {
             show_loading = true
         },
         fail = {
-            show_loading = true,
+            has_transitions = true,
         },
         win = {
-            show_loading = true,
+            has_transitions = true,
         },
         -- Popups
         help = {
-            show_loading = true,
+            has_transitions = true,
         },
         help_chapter = {
-            show_loading = true,
+            has_transitions = true,
         },
         settings = {
+            has_transitions = true,
         }
     },
 

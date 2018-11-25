@@ -1,32 +1,31 @@
 -- Defold Router Demo Project
 --
--- © 2016 Roman "Megus" Petrov, Wise Hedgehog Studio.
+-- © 2016-2018 Roman "Megus" Petrov, Wise Hedgehog Studio.
 -- https://wisehedgehog.studio, https://megus.org
 
-function init(_)
-	msg.post(".", "acquire_input_focus")
-end
+local button = require("common.button")
+local router = require("wh_router.router")
+local transition = require("common.fade_transition")
 
-function on_message(_, message_id)
-	if message_id == hash("fade_in") then
-		gui.set_color(gui.get_node("fader"), vmath.vector4(0, 0, 0, 1))
-		gui.animate(gui.get_node("fader"), "color.w", 0, gui.EASING_LINEAR, 0.3, 0, function()
-			msg.post("controller#script", "fade_done")
-		end)
-	elseif message_id == hash("fade_out") then
-		gui.set_color(gui.get_node("fader"), vmath.vector4(0, 0, 0, 0))
-		gui.animate(gui.get_node("fader"), "color.w", 1, gui.EASING_LINEAR, 0.3, 0, function()
-			msg.post("controller#script", "fade_done")
-		end)
-	end
+local rid -- Router ID
+
+function on_message(_, message_id, message)
+	if message_id == router.messages.scene_input then
+		rid = message.router
+	elseif message_id == router.messages.transition then
+		transition(message_id, message)
+	elseif message_id == router.messages.scene_popped then
+		msg.post(".", "acquire_input_focus")
+    end
 end
 
 function on_input(_, action_id, action)
-	if action_id == hash("mouse") and action.released then
-		if gui.pick_node(gui.get_node("start/box"), action.x, action.y) then
-			msg.post("controller#script", "start")
-		elseif gui.pick_node(gui.get_node("settings/box"), action.x, action.y) then
-			msg.post("controller#script", "settings")
-		end
-	end
+	button("start", action_id, action, function()
+        router.close(rid)
+	end)
+
+	button("settings", action_id, action, function()
+		msg.post(".", "release_input_focus")
+        router.popup(rid, "settings")
+	end)
 end
