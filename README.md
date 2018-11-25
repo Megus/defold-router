@@ -163,7 +163,7 @@ You can use a traditional stack-based navigation approach with the Router. You c
 #### Push a scene
 
 ```lua
-router.push(router_id, scene_name, input)
+router.push(router_id, scene_name, input, state)
 ```
 
 Pushes the new scene to the stack and passes the input to it. The current scene will be unloaded to save memory, but you can pass its state so Router can save it. When the pushed scene is closed, the current scene will be loaded again and receive the output of the pushed scene.
@@ -270,6 +270,7 @@ function on_message(self, message_id, message, sender)
         -- Router object is passed in the message, save it to use later
         self.rid = message.router
         -- Setup the scene according to the state in message.state
+        self.state = message.state
         -- Handle scene input contained in message.input
     elseif message_id == router.messages.scene_popped then
         self.rid = message.router
